@@ -1,10 +1,10 @@
-package com.walkwithme.demo;
+package com.walkwithme.backend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class WalkWithMeApplicationTests {
+class WalkwithmeApplicationTests {
 
 	@Test
 	void contextLoads() {
