@@ -1,0 +1,139 @@
+.page {
+    background-color: #e1e0e0;
+    min-height: 100vh;
+    padding: 120px 20px 20px 20px;
+
+    .page-inner {
+        height: 100%;
+
+        .product-details {
+            display: flex;
+            flex-direction: row;
+
+            .image {
+                width: 50%;
+                display: flex;
+                justify-content: center;
+                position: relative;
+
+                &::before {
+                    content: "";
+                    position: absolute;
+                    width: 400px;
+                    height: 400px;
+                    border-radius: 50%;
+                    background-color: rgb(218, 231, 73);
+                    left: 50%;
+                    margin-left: -200px;
+                    top: 50%;
+                    margin-top: -200px;
+                }
+
+                img {
+                    width: 80%;
+                    position: relative;
+                }
+            }
+
+            .content {
+                width: 50%;
+                padding-top: 50px;
+
+                .title {
+                    font-size: 40px;
+                    font-family: 'Dosis';
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    margin: 0;
+                }
+
+                .category {
+                    margin-top: 5px;
+                    font-size: 20px;
+                }
+
+                .price {
+                    font-size: 40px;
+                    margin-top: 10px;
+                    font-weight: 700;
+                }
+
+                .description {
+                    font-size: 15px;
+                    margin-top: 10px;
+                }
+
+                .colors {
+                    display: flex;
+                    align-items: center;
+                }
+
+                .size {
+                    margin: 0;
+                }
+
+                .actions {
+                    margin-top: 30px;
+                }
+            }
+        }
+    }
+}
+
+.label {
+    margin: 0;
+    padding: 0;
+    margin-right: 10px;
+    font-size: 16px;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.color {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    margin-left: 10px;
+
+    &.bg-red {
+        background-color: red;
+    }
+
+    &.bg-blue {
+        background-color: blue;
+    }
+
+    &.bg-green {
+        background-color: green;
+    }
+
+    &.bg-black {
+        background-color: black;
+    }
+}
+
+.d-flex {
+    display: flex;
+}
+
+.vertical-center {
+    align-items: center;
+    flex-direction: row;
+}
+
+.mr-3 {
+    margin-right: 30px;
+}
+
+.actions {
+    button {
+        border: none;
+        outline: none;
+        text-transform: uppercase;
+        font-weight: 700;
+        padding: 10px 20px;
+        background-color: #000;
+        color: #fff;
+        border-radius: 30px;
+    }
+}
