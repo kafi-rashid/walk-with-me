@@ -5,6 +5,8 @@ import com.walkwithme.backend.dto.LoginResponseDto;
 import com.walkwithme.backend.dto.UserDto;
 import com.walkwithme.backend.model.Role;
 import com.walkwithme.backend.model.UserEntity;
+import com.walkwithme.backend.model.UserStatus;
+import com.walkwithme.backend.repository.ReviewRepository;
 import com.walkwithme.backend.repository.RoleRepository;
 import com.walkwithme.backend.repository.UserRepository;
 import com.walkwithme.backend.service.UserService;
@@ -36,6 +38,10 @@ public class UserServiceImpl implements UserService {
     private BCryptPasswordEncoder passwordEncoder;
     @Autowired
     private RoleRepository roleRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
 
     private final JwtTokenUtil jwtUtil;
 
@@ -98,6 +104,46 @@ public class UserServiceImpl implements UserService {
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
+
+    //Approve seller by admin
+
+    public String approveSeller(Long sellerId) {
+        UserEntity seller = userRepository.findById(sellerId)
+                .orElseThrow(() -> new RuntimeException("Seller not found"));
+
+        if (!seller.getRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("Seller"))) {
+            throw new RuntimeException("User is not a seller");
+        }
+
+        seller.setStatus(UserStatus.APPROVED);
+        userRepository.save(seller);
+        return "Seller approved successfully";
+    }
+
+    //Reject Seller by admin
+
+    public String rejectSeller(Long sellerId) {
+        UserEntity seller = userRepository.findById(sellerId)
+                .orElseThrow(() -> new RuntimeException("Seller not found"));
+
+        if (!seller.getRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("Seller"))) {
+            throw new RuntimeException("User is not a seller");
+        }
+
+        seller.setStatus(UserStatus.REJECTED);
+        userRepository.save(seller);
+        return "Seller rejected successfully";
+    }
+
+    public String deleteReview(Long reviewId) {
+        if (!reviewRepository.existsById(reviewId)) {
+            throw new RuntimeException("Review not found");
+        }
+        reviewRepository.deleteById(reviewId);
+        return "Review deleted successfully";
+    }
+
+
 
 
     private UserDto convertToDto(UserEntity user) {
