@@ -9,5 +9,6 @@ import java.math.BigDecimal;
 public class ProductVariantDTO {
     private Long id;
     private String size;
+    private Double price;
     private Integer stockQuantity;
 }

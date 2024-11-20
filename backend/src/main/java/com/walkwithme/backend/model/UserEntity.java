@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,10 +31,10 @@ public class UserEntity {
     @Column(nullable = true)
     private UserStatus status = UserStatus.PENDING;
     @OneToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "shipping_address_id")
+    @JoinColumn(name = "shipping_address_id", nullable = true)
     private Address shippingAddress;
     @OneToOne(cascade=CascadeType.ALL)
-    @JoinColumn(name = "billing_address_id")
+    @JoinColumn(name = "billing_address_id", nullable = true)
     private Address billingAddress;
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
@@ -42,5 +43,16 @@ public class UserEntity {
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
     private List<Role> roles = new ArrayList<>();
+    @Column(nullable = true)
+    private String createdBy;
+
+    @Column(nullable = true)
+    private LocalDateTime createdDateTime;
+
+    @Column(nullable = true)
+    private String modifiedBy;
+
+    @Column(nullable = true)
+    private LocalDateTime modifiedDateTime;
 }
 
