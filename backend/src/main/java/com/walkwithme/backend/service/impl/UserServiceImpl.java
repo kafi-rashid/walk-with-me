@@ -1,5 +1,6 @@
 package com.walkwithme.backend.service.impl;
 
+import com.walkwithme.backend.config.CustomUserDetailsService;
 import com.walkwithme.backend.dto.LoginRequestDto;
 import com.walkwithme.backend.dto.LoginResponseDto;
 import com.walkwithme.backend.dto.UserDto;
@@ -16,18 +17,22 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AuthenticationManager;
 
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.CachingUserDetailsService;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final AuthenticationManager authenticationManager;
     @Autowired
     private UserRepository userRepository;
     @Autowired
@@ -36,8 +41,10 @@ public class UserServiceImpl implements UserService {
     private BCryptPasswordEncoder passwordEncoder;
     @Autowired
     private RoleRepository roleRepository;
-
-    private final JwtTokenUtil jwtUtil;
+    @Autowired
+    private  JwtTokenUtil jwtUtil;
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
 
     public String register(UserDto userDto) {
         try {
@@ -68,30 +75,42 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-
-
     public LoginResponseDto login(LoginRequestDto loginRequestDto) {
-        UserEntity user = userRepository.findByEmail(loginRequestDto.getEmail()).orElse(null);
-        Authentication result = null;
-        if (user == null) {
-            throw new RuntimeException("User not found");
-        }
         try {
-            result = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequestDto.getEmail(), loginRequestDto.getPassword())
-            );
-        } catch (BadCredentialsException e) {
-            throw new BadCredentialsException(e.getMessage());
-        }
+            if(loginRequestDto.getEmail()==null || loginRequestDto.getPassword()==null) {
+                throw new BadCredentialsException("Invalid email or password");
+            }
 
-        final String refreshToken = jwtUtil.generateRefreshToken(loginRequestDto.getEmail());
-        return new LoginResponseDto(
-                refreshToken,
-                user.getId(),
-                user.getFirstName(),
-                user.getLastName()
-        );
+            UserEntity user = userRepository.findByEmail(loginRequestDto.getEmail())
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+//
+            if (!passwordEncoder.matches(loginRequestDto.getPassword(), user.getPassword())) {
+                throw new RuntimeException("Invalid email or password");
+            }
+            UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getEmail());
+            String refreshToken = jwtUtil.generateToken(userDetails);
+           List<String>roles =  mapRoles(user.getRoles());
+            return new LoginResponseDto(
+                    user.getId(),
+                    refreshToken,
+                    user.getFirstName(),
+                    user.getLastName(),
+                    user.getEmail(),
+                    roles
+            );
+
+
+        } catch (RuntimeException e) {
+            throw new RuntimeException("Login failed: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException("An unexpected error occurred: " + e.getMessage());
+        }
     }
+
+    private List<String> mapRoles(List<Role> roles) {
+        return roles.stream().map(role ->  (role.getName())).collect(Collectors.toList());
+    }
+
     public List<UserDto> findAllByRoleName(String roleName) {
         return userRepository.findAllByRoleName(roleName)
                 .stream()
