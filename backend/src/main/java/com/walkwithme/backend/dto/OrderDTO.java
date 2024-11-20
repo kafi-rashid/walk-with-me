@@ -1,0 +1,19 @@
+package com.walkwithme.backend.dto;
+import com.walkwithme.backend.model.OrderStatus;
+import lombok.Builder;
+import lombok.Data;
+
+import java.util.List;
+
+@Data
+@Builder
+public class OrderDTO {
+    private Long id;
+    private Long userId;
+    private List<OrderItemDTO> items;
+    private OrderStatus status;
+    private Double totalAmount;
+    private String shippingAddress;
+    private String billingAddress;
+}
+
