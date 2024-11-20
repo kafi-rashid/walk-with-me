@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 import { Select } from 'semantic-ui-react';
 
 const roles = [
-    { key: 'Customer', value: 'Customer', text: 'Customer' },
+    { key: 'Buyer', value: 'Buyer', text: 'Buyer' },
     { key: 'Seller', value: 'Seller', text: 'Seller' },
 ];
 
@@ -28,7 +28,7 @@ export default function Register(): React.JSX.Element {
             firstName: firstName.trim(),
             lastName: lastName.trim(),
             email: email.trim(),
-            password: password.trim(),
+            password,
         };
 
         console.log('Register Payload:', payload);
