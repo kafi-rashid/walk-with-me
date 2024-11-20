@@ -1,0 +1,115 @@
+.login-container {
+    display: flex;
+    // border: thin dashed red;
+    height: 100vh;
+    background-color: #fffff1;
+    background-image: 
+        linear-gradient(#f0f4ec8a, #45ccb8dd),
+        url('https://www.zeta-shoes.com/cdn/shop/files/WELCOME.jpg?v=1716373141&width=1500');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: bottom;
+
+    .content {
+        width: 60%;
+        padding: 20px;
+
+        .content-inner {
+            height: 100%;
+            border-radius: 15px;
+            padding: 50px;
+            p {
+                font-size: 190px;
+                font-family: 'Dosis';
+                font-weight: 900;
+                text-transform: uppercase;
+                color: #ffffff96;
+                line-height: 0.8;
+            }
+        }
+    }
+
+    .input-container {
+        width: 40%;
+        // border: thin dashed red;
+        padding: 20px;
+
+        .inner {
+            background-color: #ffffffc1;
+            height: 100%;
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(10px);
+
+            .logo {
+                font-family: 'Dosis';
+                font-size: 30px;
+                font-weight: 700;
+                color: rgb(112, 118, 122);
+            }
+
+            .title {
+                font-size: 16px;
+                color: rgb(126, 132, 138);
+                margin-bottom: 20px;
+            }
+
+            .input-field {
+
+            }
+
+            .input-field,
+            .action-button {
+                width: 80%;
+                max-width: 300px;
+                margin-bottom: 15px;
+            }
+
+            .forgot-button {
+                border: none;
+                background-color: transparent;
+            }
+
+            .sign-up-here  {
+                margin-top: 20px;
+            }
+
+            .disclaimer {
+                width: 70%;
+                text-align: center;
+                margin-top: 30px;
+            }
+        }
+    }
+}
+
+.login-container.register {
+    .content {
+        width: 60%;
+    }
+
+    .input-container {
+        width: 50% !important;
+    }
+    
+    .wrapper {
+        display: flex;
+        flex-direction: column;
+        width: 400px;
+        align-items: center;
+
+        .input-field,
+        .action-button {
+            width: 100% !important;
+            max-width: unset;
+        }
+
+        div {
+            width: 100%;
+        }
+    }
+}
