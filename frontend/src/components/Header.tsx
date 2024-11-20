@@ -1,14 +1,21 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import './Header.scss';
 import { useNavigate } from 'react-router-dom';
+import { logout } from '../shared/utils';
+import { UserContext } from '../store/UserContext';
 
 export default function Header(): React.JSX.Element {
     const navigate = useNavigate();
     const [showOptions, setShowOptions] = useState(false);
+    const { user, setUser } = useContext(UserContext);
 
     const toggleOptions = () => {
         setShowOptions((prevState) => !prevState);
     };
+
+    const handleLogout = () => {
+        logout(setUser, navigate);
+    }
 
     return (
         <div className='header'>
@@ -64,7 +71,7 @@ export default function Header(): React.JSX.Element {
                 <div className={`options ${showOptions ? 'show' : ''}`}>
                     <p>Profile</p>
                     <p>Account</p>
-                    <p>Log Out</p>
+                    <p onClick={ handleLogout }>Log Out</p>
                 </div>
             </div>
         </div>

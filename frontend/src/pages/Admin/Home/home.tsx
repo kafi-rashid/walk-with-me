@@ -1,10 +1,18 @@
 import * as React from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import '../../../assets/styles/manage.scss';
+import { useContext } from 'react';
+import { UserContext } from '../../../store/UserContext';
+import { logout } from '../../../shared/utils';
 
 export default function AdminHome(): React.JSX.Element {
 
     const navigate = useNavigate();
+    const { user, setUser } = useContext(UserContext);
+
+    const handleLogout = () => {
+        logout(setUser, navigate);
+    }
 
     return (
         <div className='container'>
@@ -38,7 +46,7 @@ export default function AdminHome(): React.JSX.Element {
                     <li>
                         <NavLink to='/admin/account'>Account</NavLink>
                     </li>
-                    <li>Log Out</li>
+                    <li onClick={ handleLogout }>Log Out</li>
                 </ul>
             </div>
 

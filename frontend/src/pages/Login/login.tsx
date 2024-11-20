@@ -1,11 +1,16 @@
 import * as React from 'react';
 import './login.scss';
 import { Button, Input } from 'semantic-ui-react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { UserContext } from '../../store/UserContext';
+import { useContext } from 'react';
 
 export default function Login(): React.JSX.Element {
     const [email, setEmail] = React.useState<string>('');
     const [password, setPassword] = React.useState<string>('');
+    const { user, setUser } = useContext(UserContext);
+
+    const navigate = useNavigate();
 
     const login = () => {
         if (email.trim().length > 0 && password.trim().length > 0) {
@@ -14,6 +19,28 @@ export default function Login(): React.JSX.Element {
                 password: password.trim(),
             };
             console.log('Login Payload:', payload);
+
+
+            const loggedInAs = {
+                isAuthenticated: true,
+                token: '1234',
+                user: {
+                    firstName: 'Kafi',
+                    lastName: 'Rashid',
+                    id: 1,
+                    role: ['Buyer']
+                }
+            }
+
+            setUser(loggedInAs);
+
+            if (email === 'admin') {
+                navigate('/admin/');
+            } else if (email === 'customer') {
+                navigate('/');
+            } else {
+                navigate('/seller/')
+            }
     
             // fetch('/api/login', {
             //     method: 'POST',
@@ -32,6 +59,12 @@ export default function Login(): React.JSX.Element {
         }
     };
 
+    const handleKeyDown = (event: React.KeyboardEvent) => {
+        if (event.key === 'Enter') {
+            login();
+        }
+    };
+
     return (
         <div className='login-container'>
             <div className='content'>
@@ -40,7 +73,7 @@ export default function Login(): React.JSX.Element {
                 </div>
             </div>
 
-            <div className='input-container'>
+            <div className='input-container' onKeyDown={ handleKeyDown }>
                 <div className="inner">
                     <p className='logo'>Walk with Me</p>
                     <p className='title'>Log In to Continue</p>
