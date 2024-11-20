@@ -85,6 +85,71 @@
     .greetings {
         margin: 0;
     }
+
+    .cart {
+        position: relative;
+        margin-right: 25px;
+
+        .material-icons {
+            font-size: 24px;
+        }
+
+        .counter {
+            background-color: red;
+            padding: 2px 5px;
+            border-radius: 10px;
+            color: #fff;
+            position: absolute;
+            top: -5px;
+            right: -15px;
+            font-size: 10px;
+        }
+    }
+
+    .options {
+        position: fixed;
+        width: 200px;
+        background-color: #ffffffe5;
+        display: flex;
+        flex-direction: column;
+        top: 80px;
+        right: 0px;
+        padding: 10px 0 !important;
+        backdrop-filter: blur(10px);
+        border-radius: 10px;
+
+        display: none;
+        position: absolute;
+        top: 100%;
+        right: 0;
+        background: white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        padding: 10px;
+
+        &.show {
+            display: block;
+        }
+        
+        p {
+            width: 100%;
+            text-align: left;
+            margin: 0;
+            padding: 8px 20px;
+            color: #000;
+            font-size: 12px !important;
+            border-bottom: thin solid #0000001e;
+            cursor: pointer;
+            text-transform: uppercase;
+
+            &:last-of-type {
+                border-bottom: none;
+            }
+
+            &:hover {
+                background-color: #fff;
+            }
+        }
+    }
 }
 
 .header .user .avatar {

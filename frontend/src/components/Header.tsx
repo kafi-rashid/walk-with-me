@@ -1,19 +1,23 @@
-import * as React from 'react';
+import React, { useState } from 'react';
 import './Header.scss';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 export default function Header(): React.JSX.Element {
-
     const navigate = useNavigate();
+    const [showOptions, setShowOptions] = useState(false);
+
+    const toggleOptions = () => {
+        setShowOptions((prevState) => !prevState);
+    };
 
     return (
         <div className='header'>
-            <p className='logo'>Walk with Me</p>
+            <p className='logo' onClick={() => navigate('/')}>Walk with Me</p>
 
             <div className='menu'>
                 <ul>
-                    <li onClick={ () => navigate('/') }>Home</li>
-                    <li onClick={ () => navigate('/products') }>
+                    <li onClick={() => navigate('/')}>Home</li>
+                    <li onClick={() => navigate('/products')}>
                         Women
                         <ul>
                             <li>All Shoes</li>
@@ -46,17 +50,23 @@ export default function Header(): React.JSX.Element {
             </div>
 
             <div className='user'>
-                <div className='avatar'>
-
-                </div>
-                <p className='greetings'>Hello Kafi Rashid</p>
-                <button>
-                    <span className="material-icons">
-                        keyboard_arrow_down
-                    </span>
+                <button className='cart'>
+                    <span className="material-icons">shopping_cart</span>
+                    <span className='counter'>4</span>
                 </button>
+                <p className='greetings'>Hello Kafi Rashid</p>
+                <button onClick={toggleOptions}>
+                    <span className="material-icons">
+                        { showOptions ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }
+                        </span>
+                </button>
+
+                <div className={`options ${showOptions ? 'show' : ''}`}>
+                    <p>Profile</p>
+                    <p>Account</p>
+                    <p>Log Out</p>
+                </div>
             </div>
         </div>
-    )
+    );
 }
-

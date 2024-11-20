@@ -1,11 +1,10 @@
-import { AuthRoutes, PublicRoutes } from './routes/PageRoutes';
+import { AuthRoutes, AdminRoutes, PublicRoutes, SellerRoutes } from './routes/PageRoutes';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import 'semantic-ui-css/semantic.min.css'
+import 'semantic-ui-css/semantic.min.css';
 import AuthLayout from './layouts/AuthLayout';
 import PublicLayout from './layouts/PublicLayout';
 
 function App() {
-
   return (
     <BrowserRouter>
       <Routes>
@@ -13,22 +12,32 @@ function App() {
           path="/*"
           element={
             <AuthLayout>
-              <AuthRoutes />
+              <AuthRoutes/>
             </AuthLayout>
           }
         />
 
-      <Route
-        path="/public/*"
-        element={
-          <PublicLayout>
-            <PublicRoutes />
-          </PublicLayout>
-        }
-      />
+        <Route
+          path="/public/*"
+          element={
+            <PublicLayout>
+              <PublicRoutes/>
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/admin/*"
+          element={ <AdminRoutes/> }
+        />
+
+        <Route
+          path="/seller/*"
+          element={ <SellerRoutes/> }
+        />
       </Routes>
     </BrowserRouter>
-  )
+  );
 }
 
-export default App
+export default App;
