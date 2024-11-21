@@ -21,7 +21,7 @@ public class Product {
     private Double price;
 
     @Lob
-    @Column(columnDefinition = "TEXT") 
+    @Column(columnDefinition = "TEXT")
     private String image;
     @Column(nullable = true)
     private int quantity;
