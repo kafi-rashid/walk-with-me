@@ -37,9 +37,9 @@ public class JwtTokenUtil {
                 .getBody();
     }
 
-    public Date getIssuedAtDateFromToken(String token) {
-        return getClaimFromToken(token, Claims::getIssuedAt);
-    }
+//    public Date getIssuedAtDateFromToken(String token) {
+//        return getClaimFromToken(token, Claims::getIssuedAt);
+//    }
 
     public Date getExpirationDateFromToken(String token) {
         return getClaimFromToken(token, Claims::getExpiration);
@@ -52,8 +52,16 @@ public class JwtTokenUtil {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        claims.put("roles",userDetails.getAuthorities());
-        return doGenerateToken(claims, userDetails.getUsername());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(authority -> "ROLE_" + authority.getAuthority())
+                .toList());
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .signWith(SignatureAlgorithm.HS512, secret)
+                .compact();
     }
 
 
@@ -68,31 +76,31 @@ public class JwtTokenUtil {
     }
 
     // Overridden to accommodate the refresh token
-    public String doGenerateToken(String subject) {
-        return Jwts.builder()
-                .setSubject(subject)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
-    }
+//    public String doGenerateToken(String subject) {
+//        return Jwts.builder()
+//                .setSubject(subject)
+//                .setIssuedAt(new Date())
+//                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+//                .signWith(SignatureAlgorithm.HS512, secret)
+//                .compact();
+//    }
 
-    public String generateRefreshToken(String email) {
-        return Jwts.builder()
-                .setSubject(email)
-                .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
-                .signWith(SignatureAlgorithm.HS512, secret)
-                .compact();
-    }
-
-    public String getSubject(String token) {
-        return Jwts.parser()
-                .setSigningKey(secret)
-                .parseClaimsJws(token)
-                .getBody()
-                .getSubject();
-    }
+//    public String generateRefreshToken(String email) {
+//        return Jwts.builder()
+//                .setSubject(email)
+//                .setIssuedAt(new Date())
+//                .setExpiration(new Date(System.currentTimeMillis() + refreshExpiration))
+//                .signWith(SignatureAlgorithm.HS512, secret)
+//                .compact();
+//    }
+//
+//    public String getSubject(String token) {
+//        return Jwts.parser()
+//                .setSigningKey(secret)
+//                .parseClaimsJws(token)
+//                .getBody()
+//                .getSubject();
+//    }
 
     public boolean validateToken(String token) {
         try {
@@ -114,34 +122,34 @@ public class JwtTokenUtil {
         return false;
     }
 
-    public Authentication getAuthentication(String token) {
-        Claims claims = getAllClaimsFromToken(token);
-//        String username = claims.getSubject();
-//        var roles = (List<? extends GrantedAuthority>) claims.get("roles");
+//    public Authentication getAuthentication(String token) {
+//        Claims claims = getAllClaimsFromToken(token);
+////        String username = claims.getSubject();
+////        var roles = (List<? extends GrantedAuthority>) claims.get("roles");
+////
+////        roles.stream()
+////                .map(role -> new SimpleGrantedAuthority(role.))
+////                .collect(Collectors.toList());
+////        List<GrantedAuthority> authorities = new ArrayList<>();
+////        for (Role role : roles.getRoles()) {
+////            authorities.add(new SimpleGrantedAuthority(role.getName()));
+////        }
+////        UserDetails userDetails = new User(username, "", roles);
 //
-//        roles.stream()
-//                .map(role -> new SimpleGrantedAuthority(role.))
-//                .collect(Collectors.toList());
-//        List<GrantedAuthority> authorities = new ArrayList<>();
-//        for (Role role : roles.getRoles()) {
-//            authorities.add(new SimpleGrantedAuthority(role.getName()));
-//        }
-//        UserDetails userDetails = new User(username, "", roles);
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject()); // LEFT THIS HERE ON PURPOSE
-        var authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, userDetails.getAuthorities());
-        return authentication;
-    }
+//        UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject()); // LEFT THIS HERE ON PURPOSE
+//        var authentication = new UsernamePasswordAuthenticationToken(
+//                userDetails, null, userDetails.getAuthorities());
+//        return authentication;
+//    }
 
 
 
-    public String doGenerateRefreshToken(Map<String, Object> claims, String subject) {
-
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(SignatureAlgorithm.HS512, secret).compact();
-    }
+//    public String doGenerateRefreshToken(Map<String, Object> claims, String subject) {
+//
+//        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+//                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+//                .signWith(SignatureAlgorithm.HS512, secret).compact();
+//    }
 
 
     public String getEmailFromToken(String token) {
