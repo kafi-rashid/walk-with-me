@@ -21,6 +21,8 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private BrandRepository brandRepository;
     @Autowired
+    private ProductVarientRepository productVarientRepository;
+    @Autowired
     private UserRepository userRepository;
     @Autowired
     private OrderItemRepository orderItemRepository;
@@ -167,57 +169,72 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
         product.setDescription(productDTO.getDescription());
         product.setPrice(productDTO.getPrice());
         product.setImage(productDTO.getImage());
-
+//
         if (productDTO.getBrandId() != null) {
             Brand brand = brandRepository.findById(productDTO.getBrandId())
                     .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
             product.setBrand(brand);
         }
-
+//
         if (productDTO.getParentCategoryId() != null) {
             Category parentCategory = categoryRepository.findById(productDTO.getParentCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("Parent category not found"));
+            System.out.println("parentCategory"+parentCategory.getId());
             product.setParentCategory(parentCategory);
         }
-
+//
         if (productDTO.getChildCategoryId() != null) {
+
             Category childCategory = categoryRepository.findById(productDTO.getChildCategoryId())
                     .orElseThrow(() -> new IllegalArgumentException("Child category not found"));
+            System.out.println("childCategory"+childCategory.getId());
             product.setSubCategory(childCategory);
         }
-
+//
         if (productDTO.getDiscountId() != null) {
             Discount discount = discountRepository.findById(productDTO.getDiscountId())
                     .orElseThrow(() -> new IllegalArgumentException("Discount not found"));
             product.setDiscount(discount);
         }
-
+        if (productDTO.getSelleId() != null) {
+            UserEntity seller = userRepository.findById(productDTO.getSelleId())
+                    .orElseThrow(() -> new IllegalArgumentException("Discount not found"));
+            product.setSeller(seller);
+        }
+//
         if (productDTO.getVariants() != null && !productDTO.getVariants().isEmpty()) {
             List<ProductVariant> existingVariants = product.getVariants();
 
+            // Map DTO to entity
             List<ProductVariant> updatedVariants = productDTO.getVariants().stream().map(variantDTO -> {
-                ProductVariant variant = existingVariants.stream()
-                        .filter(v -> v.getId().equals(variantDTO.getId()))
-                        .findFirst()
-                        .orElse(new ProductVariant());
+                ProductVariant variant;
+
+                if (variantDTO.getId() != null) {
+                
+                    variant = productVarientRepository.findById(variantDTO.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("Variant not found with ID: " + variantDTO.getId()));
+                } else {
+
+                    variant = new ProductVariant();
+                    variant.setProduct(product);
+                }
+
+                // Set fields
                 variant.setSize(variantDTO.getSize());
                 variant.setPrice(variantDTO.getPrice());
                 variant.setStock(variantDTO.getStockQuantity());
-                variant.setProduct(product);
                 return variant;
             }).toList();
 
-            existingVariants.removeIf(variant -> updatedVariants.stream().noneMatch(v -> v.getId().equals(variant.getId())));
-
-            product.setVariants(updatedVariants);
-        } else {
-            product.getVariants().clear();
+            // Remove variants no longer present
+            existingVariants.removeIf(variant ->
+                    updatedVariants.stream().noneMatch(v -> v.getId() != null && v.getId().equals(variant.getId()))
+            );
         }
-
         Product updatedProduct = productRepository.save(product);
         return mapToDTO(updatedProduct);
     } catch (Exception e) {
-        throw new IllegalArgumentException("Error updating product: " + e.getMessage());
+        throw new IllegalArgumentException("Error updating product: " + e.fillInStackTrace());
     }
 }
 
@@ -282,7 +299,7 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                 .collect(Collectors.toList());
 
         ProductDTO product = null;
-        if (productId != null) {
+        if (productId != 0) {
             Product existingProduct = productRepository.findById(productId)
                     .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
 
@@ -330,6 +347,7 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                         Collections.emptyList())
                 .parentCategoryId(product.getParentCategory() != null ? product.getParentCategory().getId() : null)
                 .discountId(product.getDiscount() != null ? product.getDiscount().getId() : null)
+                .selleId(product.getSeller().getId()!=null ? product.getSeller().getId() : null)
                 .build();
     }
     private ProductListDto mapToListDTO(Product product) {
@@ -348,6 +366,7 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                                 .map(this::mapVariantToDTO)
                                 .collect(Collectors.toList()) :
                         Collections.emptyList())
+                .seller(product.getSeller()!=null ? mapSallerToDTO(product.getSeller()) : null)
                 .build();
     }
 
@@ -355,6 +374,13 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
         return BrandDTO.builder()
                 .id(brand.getId())
                 .name(brand.getName())
+                .build();
+    }
+    private SellerDto mapSallerToDTO(UserEntity user) {
+        return SellerDto.builder()
+                .sellerId(user.getId())
+                .fristName(user.getFirstName())
+                .lastName(user.getLastName())
                 .build();
     }
     private CategoryDTO mapCategoryToDTO(Category category) {
