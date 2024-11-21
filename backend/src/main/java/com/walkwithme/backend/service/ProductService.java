@@ -2,6 +2,7 @@ package com.walkwithme.backend.service;
 
 import com.walkwithme.backend.dto.ProductDTO;
 import com.walkwithme.backend.dto.ProductDetailDTO;
+import com.walkwithme.backend.dto.ProductListDto;
 
 import java.util.List;
 
@@ -10,7 +11,7 @@ public interface ProductService {
 
     ProductDTO getProductById(Long id);
 
-    List<ProductDTO> getAllProducts();
+    List<ProductListDto> getAllProducts();
 
     ProductDTO updateProduct(Long id, ProductDTO productDTO);
 

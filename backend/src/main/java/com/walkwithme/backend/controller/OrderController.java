@@ -33,6 +33,11 @@ public class OrderController {
         List<OrderDTO> orders = orderService.getAllOrders();
         return ResponseEntity.ok(orders);
     }
+    @GetMapping("/by-user/{userId}")
+    public ResponseEntity<List<OrderDTO>> getAllOrdersByUser(Long userId) {
+        List<OrderDTO> orders = orderService.getAllOrdersByUser(userId);
+        return ResponseEntity.ok(orders);
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @RequestBody OrderDTO orderDTO) {
@@ -59,13 +64,4 @@ public class OrderController {
         return ResponseEntity.ok("Order canceled successfully");
     }
 
-    // Endpoint to update the order status
-    /*@PutMapping("/{orderId}/status")
-    public ResponseEntity<String> updateOrderStatus(
-            @PathVariable Long orderId,
-            @RequestParam Long sellerId,
-            @RequestParam OrderStatus newStatus) {
-        orderService.updateOrderStatus(orderId, sellerId, newStatus);
-        return ResponseEntity.ok("Order status updated successfully");
-    }*/
 }

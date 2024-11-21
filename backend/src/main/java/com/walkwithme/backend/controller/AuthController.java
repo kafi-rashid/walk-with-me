@@ -22,9 +22,4 @@ public class AuthController {
     {
         return authService.login(loginRequestDto);
     }
-//    @GetMapping("/users")
-//    public List<UserDto> getAllSeller()
-//    {
-//        return userService.findAllByRoleName("Seller");
-//    }
 }

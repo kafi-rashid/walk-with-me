@@ -10,7 +10,8 @@ import java.util.List;
 public class ProductDetailDTO {
     private ProductDTO product;
     private List<BrandDTO> brands;
-    private List<CategoryDTO> categories;
+    private List<CategoryDTO> parentCategories;
+    private List<CategoryDTO> childCategories;
     private List<DiscountDTO> discounts;
     private List<ProductVariantDTO> variants;
 }

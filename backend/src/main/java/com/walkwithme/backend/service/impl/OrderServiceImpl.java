@@ -3,10 +3,7 @@ package com.walkwithme.backend.service.impl;
 import com.walkwithme.backend.dto.OrderDTO;
 import com.walkwithme.backend.dto.OrderItemDTO;
 import com.walkwithme.backend.model.*;
-import com.walkwithme.backend.repository.OrderRepository;
-import com.walkwithme.backend.repository.OrderItemRepository;
-import com.walkwithme.backend.repository.ProductRepository;
-import com.walkwithme.backend.repository.UserRepository;
+import com.walkwithme.backend.repository.*;
 import com.walkwithme.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +16,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderRepository orderRepository;
+    @Autowired
+    private ProductVarientRepository productVarientRepository;
 
     @Autowired
     private OrderItemRepository orderItemRepository;
@@ -31,28 +30,41 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public OrderDTO createOrder(OrderDTO orderDTO) {
+        UserEntity user = userRepository.findById(orderDTO.getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + orderDTO.getUserId()));
+
         Order order = new Order();
-        order.setUser(userRepository.findById(orderDTO.getUserId())
-                .orElseThrow(() -> new IllegalArgumentException("User not found")));
+        order.setUser(user);
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(orderDTO.getTotalAmount());
         order.setShippingAddress(orderDTO.getShippingAddress());
         order.setBillingAddress(orderDTO.getBillingAddress());
+
         Order savedOrder = orderRepository.save(order);
-        for (OrderItemDTO itemDTO : orderDTO.getItems()) {
+
+        List<OrderItem> orderItems = orderDTO.getItems().stream().map(itemDTO -> {
+            Product product = productRepository.findById(itemDTO.getProductId())
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + itemDTO.getProductId()));
+
             OrderItem item = new OrderItem();
             item.setOrder(savedOrder);
-            item.setProduct(productRepository.findById(itemDTO.getProductId())
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found")));
-//            item.setVariant(itemDTO.getVariantId() != null ? productRepository.findVariantById(itemDTO.getVariantId()) : null);
+            item.setProduct(product);
+            item.setVariant(itemDTO.getVariantId() != null
+                    ? productVarientRepository.findById(itemDTO.getVariantId())
+                    .orElseThrow(() -> new IllegalArgumentException("Variant not found with ID: " + itemDTO.getVariantId()))
+                    : null);
             item.setQuantity(itemDTO.getQuantity());
             item.setPrice(itemDTO.getPrice());
+            return item;
+        }).collect(Collectors.toList());
 
-            orderItemRepository.save(item);
-        }
+        orderItemRepository.saveAll(orderItems);
+
+        savedOrder.setItems(orderItems);
 
         return mapToDTO(savedOrder);
     }
+
 
     @Override
     public OrderDTO getOrderById(Long id) {
@@ -66,6 +78,19 @@ public class OrderServiceImpl implements OrderService {
         List<Order> orders = orderRepository.findAll();
         return orders.stream().map(this::mapToDTO).collect(Collectors.toList());
     }
+
+    @Override
+    public List<OrderDTO> getAllOrdersByUser(Long userId) {
+        try {
+            List<Order> orders = orderRepository.findAllOrdersByUserId(userId);
+            return orders.stream()
+                    .map(this::mapToDTO)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching orders for user with ID: " + userId, e);
+        }
+    }
+
 
     @Override
     public OrderDTO updateOrder(Long id, OrderDTO orderDTO) {
@@ -114,34 +139,16 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
-   /* @Override
-    public void updateOrderStatus(Long orderId, Long sellerId, OrderStatus newStatus) {
-        // Retrieve the order from the database
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        // Check if the logged-in seller is the one managing the order
-        if (!order.getUser().getId().equals(sellerId)) {
-            throw new RuntimeException("You do not have permission to update this order");
-        }
-
-        // Prevent updating the order if it's already delivered or canceled
-        if (order.getStatus() == OrderStatus.DELIVERED || order.getStatus() == OrderStatus.CANCELLED) {
-            throw new RuntimeException("Cannot update a delivered or canceled order");
-        }
-
-        // Prevent setting an invalid status transition
-        if (newStatus == OrderStatus.CANCELLED) {
-            throw new RuntimeException("Order cannot be marked as CANCELLED here, use the cancel action instead");
-        }
-
-        // Update the order status
-        order.setStatus(newStatus);
-
-        // Save the updated order
-        orderRepository.save(order);
+    private OrderItemDTO mapOrderItemToDTO(OrderItem orderItem) {
+        return OrderItemDTO.builder()
+                .id(orderItem.getId())
+                .productId(orderItem.getProduct().getId())
+                .productName(orderItem.getProduct().getName())
+                .quantity(orderItem.getQuantity())
+                .price(orderItem.getPrice())
+                .build();
     }
-*/
+
     private OrderDTO mapToDTO(Order order) {
         List<OrderItemDTO> itemDTOs = order.getItems().stream()
                 .map(item -> OrderItemDTO.builder()

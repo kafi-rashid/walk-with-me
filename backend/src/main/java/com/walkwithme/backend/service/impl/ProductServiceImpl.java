@@ -3,14 +3,12 @@ package com.walkwithme.backend.service.impl;
 import com.walkwithme.backend.dto.*;
 
 import com.walkwithme.backend.model.*;
-import com.walkwithme.backend.repository.ProductRepository;
-import com.walkwithme.backend.repository.BrandRepository;
-import com.walkwithme.backend.repository.CategoryRepository;
-import com.walkwithme.backend.repository.DiscountRepository;
+import com.walkwithme.backend.repository.*;
 import com.walkwithme.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,6 +20,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private BrandRepository brandRepository;
+    @Autowired
+    private OrderItemRepository orderItemRepository;
 
     @Autowired
     private CategoryRepository categoryRepository;
@@ -41,28 +41,28 @@ public class ProductServiceImpl implements ProductService {
             // Set Brand
             if (productDTO.getBrandId() != null) {
                 Brand brand = brandRepository.findById(productDTO.getBrandId())
-                        .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
+                        .orElseThrow(() -> new IllegalArgumentException("Brand not found with ID: " + productDTO.getBrandId()));
                 product.setBrand(brand);
-            }
-
-            // Set Subcategory
-            if (productDTO.getChildCategoryId() != null) {
-                Category subCategory = categoryRepository.findById(productDTO.getChildCategoryId())
-                        .orElseThrow(() -> new IllegalArgumentException("Sub-category not found"));
-                product.setSubCategory(subCategory);
             }
 
             // Set Parent Category
             if (productDTO.getParentCategoryId() != null) {
                 Category parentCategory = categoryRepository.findById(productDTO.getParentCategoryId())
-                        .orElseThrow(() -> new IllegalArgumentException("Parent category not found"));
+                        .orElseThrow(() -> new IllegalArgumentException("Parent category not found with ID: " + productDTO.getParentCategoryId()));
                 product.setParentCategory(parentCategory);
+            }
+
+            // Set Subcategory
+            if (productDTO.getChildCategoryId() != null) {
+                Category subCategory = categoryRepository.findById(productDTO.getChildCategoryId())
+                        .orElseThrow(() -> new IllegalArgumentException("Sub-category not found with ID: " + productDTO.getChildCategoryId()));
+                product.setSubCategory(subCategory);
             }
 
             // Set Discount
             if (productDTO.getDiscountId() != null) {
                 Discount discount = discountRepository.findById(productDTO.getDiscountId())
-                        .orElseThrow(() -> new IllegalArgumentException("Discount not found"));
+                        .orElseThrow(() -> new IllegalArgumentException("Discount not found with ID: " + productDTO.getDiscountId()));
                 product.setDiscount(discount);
             }
 
@@ -73,18 +73,25 @@ public class ProductServiceImpl implements ProductService {
                     variant.setSize(variantDTO.getSize());
                     variant.setPrice(variantDTO.getPrice());
                     variant.setStock(variantDTO.getStockQuantity());
-                    variant.setProduct(product); // Link the variant to the product
+                    variant.setProduct(product);
                     return variant;
                 }).toList();
-                product.setVariants(variants); // Add variants to the product
+
+                // Add the variants to the product
+                product.setVariants(variants);
             }
 
+            // Save Product
+
             Product savedProduct = productRepository.save(product);
+            System.out.println("Prianka product"+savedProduct);
+            // Return the saved product as a DTO
             return mapToDTO(savedProduct);
         } catch (Exception e) {
-            throw new IllegalArgumentException("Error creating product: " + e.getMessage());
+            throw new IllegalArgumentException("Error creating product: " + e.getMessage(), e);
         }
     }
+
 
 
     @Override
@@ -95,9 +102,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductDTO> getAllProducts() {
+    public List<ProductListDto> getAllProducts() {
         return productRepository.findAll().stream()
-                .map(this::mapToDTO)
+                .map(this::mapToListDTO)
                 .collect(Collectors.toList());
     }
 
@@ -149,11 +156,20 @@ public class ProductServiceImpl implements ProductService {
         try {
             Product product = productRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
+
+            // Check if the product is associated with any orders
+            if (orderItemRepository.existsByProductId(id)) {
+                throw new IllegalStateException("Product cannot be deleted as it has been purchased.");
+            }
+
             productRepository.delete(product);
+        } catch (IllegalArgumentException | IllegalStateException e) {
+            throw e; // Rethrow the specific exceptions
         } catch (Exception e) {
             throw new IllegalArgumentException("Error deleting product: " + e.getMessage());
         }
     }
+
     @Override
     public ProductDetailDTO getProductDetailsForEdit(Long productId) {
         List<BrandDTO> brands = brandRepository.findAll().stream()
@@ -165,6 +181,13 @@ public class ProductServiceImpl implements ProductService {
 
         List<CategoryDTO> parentCategories = categoryRepository.findAll().stream()
                 .filter(category -> category.getParentId() == null)
+                .map(category -> CategoryDTO.builder()
+                        .id(category.getId())
+                        .name(category.getName())
+                        .build())
+                .collect(Collectors.toList());
+        List<CategoryDTO> childCategories = categoryRepository.findAll().stream()
+                .filter(category -> category.getParentId() != null)
                 .map(category -> CategoryDTO.builder()
                         .id(category.getId())
                         .name(category.getName())
@@ -205,7 +228,8 @@ public class ProductServiceImpl implements ProductService {
 
         return ProductDetailDTO.builder()
                 .brands(brands)
-                .categories(parentCategories)
+                .parentCategories(parentCategories)
+                .childCategories(childCategories)
                 .discounts(discounts)
                 .variants(product != null ? product.getVariants() : null)
                 .build();
@@ -219,8 +243,62 @@ public class ProductServiceImpl implements ProductService {
                 .price(product.getPrice())
                 .image(product.getImage())
                 .brandId(product.getBrand() != null ? product.getBrand().getId() : null)
+                .childCategoryId(product.getSubCategory() != null ? product.getSubCategory().getId() : null)
+                .variants(product.getVariants() != null ?
+                        product.getVariants().stream()
+                                .map(this::mapVariantToDTO)
+                                .collect(Collectors.toList()) :
+                        Collections.emptyList())
                 .parentCategoryId(product.getParentCategory() != null ? product.getParentCategory().getId() : null)
                 .discountId(product.getDiscount() != null ? product.getDiscount().getId() : null)
                 .build();
     }
+    private ProductListDto mapToListDTO(Product product) {
+        return ProductListDto.builder()
+                .id(product.getId())
+                .name(product.getName())
+                .description(product.getDescription())
+                .price(product.getPrice())
+                .image(product.getImage())
+                .brand(product.getBrand() != null ? mapBrandToDTO(product.getBrand()) : null)
+                .childCategory(product.getSubCategory() != null ? mapCategoryToDTO(product.getSubCategory()) : null)
+                .parentCategory(product.getParentCategory() != null ? mapCategoryToDTO(product.getParentCategory()) : null)
+                .discount(product.getDiscount() != null ? mapDiscountToDTO(product.getDiscount()) : null)
+                .variants(product.getVariants() != null ?
+                        product.getVariants().stream()
+                                .map(this::mapVariantToDTO)
+                                .collect(Collectors.toList()) :
+                        Collections.emptyList())
+                .build();
+    }
+
+    private BrandDTO mapBrandToDTO(Brand brand) {
+        return BrandDTO.builder()
+                .id(brand.getId())
+                .name(brand.getName())
+                .build();
+    }
+    private CategoryDTO mapCategoryToDTO(Category category) {
+        return CategoryDTO.builder()
+                .id(category.getId())
+                .name(category.getName())
+                .parentId(category.getParentId() != null ? category.getParentId() : null)
+                .build();
+    }
+    private DiscountDTO mapDiscountToDTO(Discount discount) {
+        return DiscountDTO.builder()
+                .id(discount.getId())
+                .name(discount.getName())
+                .percentage(discount.getPercentage())
+                .build();
+    }
+    private ProductVariantDTO mapVariantToDTO(ProductVariant variant) {
+        return ProductVariantDTO.builder()
+                .id(variant.getId())
+                .size(variant.getSize())
+                .price(variant.getPrice())
+                .stockQuantity(variant.getStock())
+                .build();
+    }
+
 }
