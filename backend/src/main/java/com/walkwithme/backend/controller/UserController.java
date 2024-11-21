@@ -28,4 +28,9 @@ public class UserController {
     {
         return userService.approve(userIds);
     }
+    @PostMapping("/reject")
+    public  String reject(@RequestBody List<Long>userIds)
+    {
+        return userService.approve(userIds);
+    }
 }

@@ -29,14 +29,6 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<UserDto> findAll() {
-        return userRepository.findAll()
-                .stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
-
     //    @Override
 //    public String approve(List<Long> userIds) {
 //        try {
@@ -52,7 +44,16 @@ public class UserServiceImpl implements UserService {
 //            return "Approval process failed: " + e.getMessage();
 //        }
 //    }
-@Override
+
+    @Override
+    public List<UserDto> findAll() {
+        return userRepository.findAll()
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
 public String approve(List<Long> userIds) {
     List<UserEntity> approvedUsers = new ArrayList<>();
     StringBuilder errorMessages = new StringBuilder();
@@ -77,6 +78,31 @@ public String approve(List<Long> userIds) {
             ? "Some approvals failed:\n" + errorMessages.toString()
             : "All users approved successfully.";
 }
+    @Override
+    public String reject(List<Long> userIds) {
+        List<UserEntity> approvedUsers = new ArrayList<>();
+        StringBuilder errorMessages = new StringBuilder();
+
+        for (Long userId : userIds) {
+            try {
+                UserEntity userEntity = userRepository.findById(userId)
+                        .orElseThrow(() -> new IllegalArgumentException("User ID " + userId + " not found"));
+
+                userEntity.setStatus(UserStatus.REJECTED);
+                approvedUsers.add(userEntity);
+            } catch (Exception e) {
+                errorMessages.append("Failed to reject User ID ").append(userId).append(": ").append(e.getMessage()).append("\n");
+            }
+        }
+
+        if (!approvedUsers.isEmpty()) {
+            userRepository.saveAll(approvedUsers);
+        }
+
+        return errorMessages.length() > 0
+                ? "Some rejects failed:\n" + errorMessages.toString()
+                : "All users rejects successfully.";
+    }
 
 
 
