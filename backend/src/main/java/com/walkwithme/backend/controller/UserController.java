@@ -23,6 +23,11 @@ public class UserController {
     {
         return userService.findAllPendingUser();
     }
+    @DeleteMapping("/{id}")
+    public String deleById(@PathVariable Long id)
+    {
+        return userService.deleteById(id);
+    }
     @PostMapping("/approve")
     public  String approve(@RequestBody List<Long>userIds)
     {
@@ -31,6 +36,6 @@ public class UserController {
     @PostMapping("/reject")
     public  String reject(@RequestBody List<Long>userIds)
     {
-        return userService.approve(userIds);
+        return userService.reject(userIds);
     }
 }
