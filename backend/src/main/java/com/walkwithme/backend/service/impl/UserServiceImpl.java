@@ -107,6 +107,17 @@ public class UserServiceImpl implements UserService {
                 : "All users rejects successfully.";
     }
 
+    @Override
+    public String deleteById(Long id) {
+        try {
+            userRepository.deleteById(id);
+            return "User with ID " + id + " has been deleted successfully.";
+        } catch (Exception e) {
+            return "Failed to delete user with ID " + id + ": " + e.getMessage();
+        }
+    }
+
+
 
     public String approveSeller(Long sellerId) {
         UserEntity seller = userRepository.findById(sellerId)

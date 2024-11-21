@@ -9,4 +9,5 @@ public interface UserService {
     List<UserDto> findAll();
     String approve (List <Long>userIds);
     String reject (List <Long>userIds);
+    String deleteById (Long id);
 }
