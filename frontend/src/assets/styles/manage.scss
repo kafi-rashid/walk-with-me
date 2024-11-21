@@ -4,7 +4,7 @@
     background-color: #e5e2e2 !important;
     min-height: 100vh;
 
-    .header {        
+    .page-header {        
         ul {
             list-style-type: none;
             padding: 0;
@@ -42,7 +42,7 @@
     }
 }
 
-.header {
+.page-header {
     height: 80px;
     position: fixed;
     left: 20px;
@@ -58,16 +58,16 @@
     backdrop-filter: blur(10px);
 }
 
-.header * {
+.page-header * {
     color: #564646;
 }
 
-.header *:not(.logo) {
+.page-header *:not(.logo) {
     cursor: pointer;
     font-weight: 500 !important;
 }
 
-.header ul {
+.page-header ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
@@ -75,7 +75,7 @@
     flex-direction: row;
 }
 
-.header ul li:not(ul li ul li) {
+.page-header ul li:not(ul li ul li) {
     position: relative;
     height: 80px;
     display: flex;
@@ -84,7 +84,7 @@
     // padding: 0 20px;
 }
 
-.header ul ul {
+.page-header ul ul {
     display: none !important;
     position: absolute;
     top: 100%;
@@ -95,25 +95,30 @@
     backdrop-filter: blur(10px);
 }
 
-.header li:hover {
+.page-header li:hover {
     background-color: #ffffff43;
 }
 
-.header li:hover > ul {
+.page-header li:hover > ul {
     display: block !important;
 }
 
-.header ul ul li {
+.page-header ul ul li {
     display: block;
     padding: 15px 20px;
     color: #000;
     margin: 0 !important;
 }
 
-.header .ul li {
+.page-header .ul li {
     text-align: left !important;
 }
 
-.header ul ul li:hover {
+.page-header ul ul li:hover {
     background-color: rgba(160, 160, 160, 0.194);
 }
+
+.delete-column {
+    width: 50px;
+}
+  

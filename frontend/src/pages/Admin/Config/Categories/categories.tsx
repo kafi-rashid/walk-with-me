@@ -11,95 +11,184 @@ import {
   Icon,
   Table,
   Menu,
-  MenuItem
+  MenuItem,
+  Input,
+  Confirm, // Import Confirm component
 } from 'semantic-ui-react';
+import useAxios from '../../../../shared/axios';
 
-interface Product {
+interface Category {
   id: number;
   name: string;
-  price: number;
-  brand: string;
-  category: string;
-  subcategory: string;
-  stockLeft: number;
 }
 
 export default function Categories(): React.JSX.Element {
-  const [products, setProducts] = React.useState<Product[]>([
-    {
-      id: 1,
-      name: 'Laptop Pro',
-      price: 1299.99,
-      brand: 'TechBrand',
-      category: 'Electronics',
-      subcategory: 'Laptops',
-      stockLeft: 25,
-    },
-    {
-      id: 2,
-      name: 'Smartphone X',
-      price: 999.99,
-      brand: 'PhoneCorp',
-      category: 'Electronics',
-      subcategory: 'Smartphones',
-      stockLeft: 40,
-    },
-    {
-      id: 3,
-      name: 'Gaming Headset',
-      price: 199.99,
-      brand: 'GamerGear',
-      category: 'Accessories',
-      subcategory: 'Headsets',
-      stockLeft: 50,
-    },
-  ]);
+  const [categories, setCategories] = React.useState<Category[]>([]);
+  const [editingCategoryId, setEditingCategoryId] = React.useState<number | null>(null);
+  const [editingName, setEditingName] = React.useState<string>('');
+  const [newCategoryName, setNewCategoryName] = React.useState<string>('');
+  const [isAddingCategory, setIsAddingCategory] = React.useState<boolean>(false);
+  const [confirmDeleteId, setConfirmDeleteId] = React.useState<number | null>(null); // State for confirmation
+  const axios = useAxios();
 
-  const addProduct = () => {
-    // Placeholder for adding a new product
-    alert('Add Product functionality coming soon!');
+  React.useEffect(() => {
+    axios.get('/categories/')
+      .then(({ data }) => {
+        setCategories(data);
+      })
+      .catch((error) => {
+        console.log("Error", error);
+      });
+  }, []);
+
+  const startEditing = (categoryId: number, currentName: string) => {
+    setEditingCategoryId(categoryId);
+    setEditingName(currentName);
+  };
+
+  const saveEdit = (categoryId: number) => {
+    if (editingName.trim().length <= 0) {
+      setEditingCategoryId(null);
+      setEditingName('');
+      return;
+    }
+    axios.put(`/categories/${categoryId}`, { name: editingName })
+      .then(() => {
+        setCategories((prevCategories) =>
+          prevCategories.map((category) =>
+            category.id === categoryId ? { ...category, name: editingName } : category
+          )
+        );
+        setEditingCategoryId(null);
+        setEditingName('');
+      })
+      .catch((error) => {
+        console.log("Error updating category:", error);
+        setEditingCategoryId(null);
+      });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, categoryId: number) => {
+    if (e.key === 'Enter') {
+      saveEdit(categoryId);
+    }
+  };
+
+  const addCategoryRow = () => {
+    setIsAddingCategory(true);
+    setNewCategoryName('');
+  };
+
+  const saveNewCategory = () => {
+    if (newCategoryName.trim().length <= 0) {
+      setIsAddingCategory(false);
+      return;
+    }
+    axios.post('/categories', { name: newCategoryName })
+      .then(({ data }) => {
+        setCategories((prevCategories) => [data, ...prevCategories]);
+        setIsAddingCategory(false);
+      })
+      .catch((error) => {
+        console.log("Error adding new category:", error);
+        setIsAddingCategory(false);
+      });
+  };
+
+  const handleNewCategoryKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      saveNewCategory();
+    }
+  };
+
+  const deleteCategory = () => {
+    if (confirmDeleteId !== null) {
+      axios.delete(`/categories/${confirmDeleteId}`)
+        .then(() => {
+          setCategories((prevCategories) =>
+            prevCategories.filter((category) => category.id !== confirmDeleteId)
+          );
+          setConfirmDeleteId(null); // Close the confirmation dialog
+        })
+        .catch((error) => {
+          console.log("Error deleting category:", error);
+        });
+    }
+  };
+
+  const cancelDelete = () => {
+    setConfirmDeleteId(null); // Close the confirmation dialog without deleting
   };
 
   return (
     <div className='manage-page'>
-      <div className='d-flex justify-content-between'>
+      <div className="d-flex justify-content-between">
         <p className='page-title'>Categories</p>
-        <Button
-          icon
-          labelPosition='left'
-          primary
-          size='small'
-          onClick={addProduct}
-        >
-          <Icon name='add' /> Add Category
-        </Button>
       </div>
 
       <Divider />
       <div className="page-content">
-        <Table compact celled>
+        <Table celled>
           <TableHeader>
             <TableRow>
-              <TableHeaderCell>ID</TableHeaderCell>
-              <TableHeaderCell>Name</TableHeaderCell>
-              <TableHeaderCell>Price</TableHeaderCell>
-              <TableHeaderCell>Brand</TableHeaderCell>
-              <TableHeaderCell>Category</TableHeaderCell>
-              <TableHeaderCell>Subcategory</TableHeaderCell>
-              <TableHeaderCell>Stock Left</TableHeaderCell>
+              <TableHeaderCell style={{ width: '50px' }}>ID</TableHeaderCell>
+              <TableHeaderCell colSpan={ 2 } className='d-flex align-items-center justify-content-between' style={{ width: 'calc(100% + 62px)' }}> 
+                Name
+                <Button
+                  icon
+                  labelPosition='left'
+                  primary
+                  size='small'
+                  floated='right'
+                  onClick={addCategoryRow}
+                >
+                  <Icon name='add' /> Add Category
+                </Button>
+              </TableHeaderCell>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {products.map(product => (
-              <TableRow key={product.id}>
-                <TableCell>{product.id}</TableCell>
-                <TableCell>{product.name}</TableCell>
-                <TableCell>${product.price.toFixed(2)}</TableCell>
-                <TableCell>{product.brand}</TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.subcategory}</TableCell>
-                <TableCell>{product.stockLeft}</TableCell>
+            {isAddingCategory && (
+              <TableRow>
+                <TableCell>New</TableCell>
+                <TableCell>
+                  <Input
+                    value={newCategoryName}
+                    onChange={(e) => setNewCategoryName(e.target.value)}
+                    onKeyDown={handleNewCategoryKeyDown}
+                    onBlur={saveNewCategory}
+                    autoFocus
+                  />
+                </TableCell>
+              </TableRow>
+            )}
+            {categories.map((category) => (
+              <TableRow key={category.id}>
+                <TableCell>{category.id}</TableCell>
+                <TableCell onDoubleClick={() => startEditing(category.id, category.name)}>
+                  {editingCategoryId === category.id ? (
+                    <Input
+                      value={editingName}
+                      onChange={(e) => setEditingName(e.target.value)}
+                      onBlur={() => saveEdit(category.id)}
+                      onKeyDown={(e) => handleKeyDown(e, category.id)}
+                      autoFocus
+                    />
+                  ) : (
+                    category.name
+                  )}
+                </TableCell>
+                <TableCell style={{ width: '50px' }}>
+                  <Button
+                    icon
+                    color="red"
+                    onClick={() => setConfirmDeleteId(category.id)} // Open confirmation dialog
+                    size="small"
+                  >
+                    <Icon name="trash" />
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -123,6 +212,15 @@ export default function Categories(): React.JSX.Element {
             </TableRow>
           </TableFooter>
         </Table>
+
+        {/* Confirmation Dialog */}
+        <Confirm
+          open={confirmDeleteId !== null}
+          header='Delete Category'
+          content={`Are you sure you want to delete this category?`}
+          onCancel={cancelDelete}
+          onConfirm={deleteCategory}
+        />
       </div>
     </div>
   );

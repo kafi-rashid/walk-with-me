@@ -22,7 +22,7 @@ export default function Header(): React.JSX.Element {
     }
 
     return (
-        <div className='header'>
+        <div className='page-header'>
             <p className='logo' onClick={() => navigate('/')}>Walk with Me</p>
 
             <div className='menu'>

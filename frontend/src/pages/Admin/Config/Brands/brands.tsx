@@ -11,98 +11,200 @@ import {
   Icon,
   Table,
   Menu,
-  MenuItem
+  MenuItem,
+  Input,
+  Confirm,
 } from 'semantic-ui-react';
+import useAxios from '../../../../shared/axios';
 
-interface Product {
+interface Brand {
   id: number;
   name: string;
-  price: number;
-  brand: string;
-  category: string;
-  subcategory: string;
-  stockLeft: number;
 }
 
 export default function Brands(): React.JSX.Element {
-  const [products, setProducts] = React.useState<Product[]>([
-    {
-      id: 1,
-      name: 'Laptop Pro',
-      price: 1299.99,
-      brand: 'TechBrand',
-      category: 'Electronics',
-      subcategory: 'Laptops',
-      stockLeft: 25,
-    },
-    {
-      id: 2,
-      name: 'Smartphone X',
-      price: 999.99,
-      brand: 'PhoneCorp',
-      category: 'Electronics',
-      subcategory: 'Smartphones',
-      stockLeft: 40,
-    },
-    {
-      id: 3,
-      name: 'Gaming Headset',
-      price: 199.99,
-      brand: 'GamerGear',
-      category: 'Accessories',
-      subcategory: 'Headsets',
-      stockLeft: 50,
-    },
-  ]);
+  const [brands, setBrands] = React.useState<Brand[]>([]);
+  const [editingBrandId, setEditingBrandId] = React.useState<number | null>(null);
+  const [editingName, setEditingName] = React.useState<string>('');
+  const [newBrandName, setNewBrandName] = React.useState<string>('');
+  const [isAddingBrand, setIsAddingBrand] = React.useState<boolean>(false);
+  const [confirmDeleteId, setConfirmDeleteId] = React.useState<number | null>(null);
+  const axios = useAxios();
 
-  const addProduct = () => {
-    // Placeholder for adding a new product
-    alert('Add Product functionality coming soon!');
+  React.useEffect(() => {
+    axios.get('/brands/')
+      .then(({ data }) => {
+        setBrands(data);
+      })
+      .catch((error) => {
+        console.log("Error", error);
+      });
+  }, []);
+
+  const startEditing = (brandId: number, currentName: string) => {
+    setEditingBrandId(brandId);
+    setEditingName(currentName);
+  };
+
+  const saveEdit = (brandId: number) => {
+    if (editingName.trim().length <= 0) {
+      setEditingBrandId(null);
+      setEditingName('');
+      return;
+    }
+    axios.put(`/brands/${brandId}`, { name: editingName })
+      .then(() => {
+        setBrands((prevBrands) =>
+          prevBrands.map((brand) =>
+            brand.id === brandId ? { ...brand, name: editingName } : brand
+          )
+        );
+        setEditingBrandId(null);
+        setEditingName('');
+      })
+      .catch((error) => {
+        console.log("Error updating brand:", error);
+        setEditingBrandId(null);
+      });
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent, brandId: number) => {
+    if (e.key === 'Enter') {
+      saveEdit(brandId);
+    }
+  };
+
+  const addBrandRow = () => {
+    setIsAddingBrand(true);
+    setNewBrandName('');
+  };
+
+  const saveNewBrand = () => {
+    if (newBrandName.trim().length <= 0) {
+      setIsAddingBrand(false);
+      return;
+    }
+    axios.post('/brands', { name: newBrandName })
+      .then(({ data }) => {
+        setBrands((prevBrands) => [data, ...prevBrands]);
+        setIsAddingBrand(false);
+      })
+      .catch((error) => {
+        console.log("Error adding new brand:", error);
+        setIsAddingBrand(false);
+      });
+  };
+
+  const handleNewBrandKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      saveNewBrand();
+    }
+  };
+
+  const deleteBrand = () => {
+    if (confirmDeleteId !== null) {
+      axios.delete(`/brands/${confirmDeleteId}`)
+        .then(() => {
+          setBrands((prevBrands) =>
+            prevBrands.filter((brand) => brand.id !== confirmDeleteId)
+          );
+          setConfirmDeleteId(null); // Close the confirmation dialog
+        })
+        .catch((error) => {
+          console.log("Error deleting brand:", error);
+        });
+    }
+  };
+
+  const cancelDelete = () => {
+    setConfirmDeleteId(null); // Close the confirmation dialog without deleting
   };
 
   return (
     <div className='manage-page'>
-      <div className='d-flex justify-content-between'>
+      <div className="d-flex justify-content-between">
         <p className='page-title'>Brands</p>
-        <Button
-          icon
-          labelPosition='left'
-          primary
-          size='small'
-          onClick={addProduct}
-        >
-          <Icon name='add' /> Add Brand
-        </Button>
       </div>
 
       <Divider />
       <div className="page-content">
-        <Table compact celled>
+        <Table celled>
           <TableHeader>
             <TableRow>
-              <TableHeaderCell>ID</TableHeaderCell>
-              <TableHeaderCell>Name</TableHeaderCell>
-              <TableHeaderCell>Price</TableHeaderCell>
-              <TableHeaderCell>Brand</TableHeaderCell>
-              <TableHeaderCell>Category</TableHeaderCell>
-              <TableHeaderCell>Subcategory</TableHeaderCell>
-              <TableHeaderCell>Stock Left</TableHeaderCell>
+              <TableHeaderCell style={{ width: '50px' }}>ID</TableHeaderCell>
+              <TableHeaderCell colSpan={ 2 } className='d-flex align-items-center justify-content-between' style={{ width: 'calc(100% + 62px)' }}> 
+                Name
+                <Button
+                  icon
+                  labelPosition='left'
+                  primary
+                  size='small'
+                  floated='right'
+                  onClick={addBrandRow}
+                >
+                  <Icon name='add' /> Add Brand
+                </Button>
+              </TableHeaderCell>
             </TableRow>
           </TableHeader>
 
+
           <TableBody>
-            {products.map(product => (
-              <TableRow key={product.id}>
-                <TableCell>{product.id}</TableCell>
-                <TableCell>{product.name}</TableCell>
-                <TableCell>${product.price.toFixed(2)}</TableCell>
-                <TableCell>{product.brand}</TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.subcategory}</TableCell>
-                <TableCell>{product.stockLeft}</TableCell>
+            {isAddingBrand && (
+              <TableRow>
+                <TableCell>New</TableCell>
+                <TableCell>
+                  <Input
+                    value={newBrandName}
+                    onChange={(e) => setNewBrandName(e.target.value)}
+                    onKeyDown={handleNewBrandKeyDown}
+                    onBlur={saveNewBrand}
+                    autoFocus
+                  />
+                </TableCell>
+                <TableCell>
+                  <Button
+                    icon
+                    color="green"
+                    onClick={saveNewBrand}
+                    size="small"
+                  >
+                    <Icon name="check" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            )}
+            {brands.map((brand) => (
+              <TableRow key={brand.id}>
+                <TableCell>{brand.id}</TableCell>
+                <TableCell onDoubleClick={() => startEditing(brand.id, brand.name)}>
+                  {editingBrandId === brand.id ? (
+                    <Input
+                      value={editingName}
+                      onChange={(e) => setEditingName(e.target.value)}
+                      onBlur={() => saveEdit(brand.id)}
+                      onKeyDown={(e) => handleKeyDown(e, brand.id)}
+                      autoFocus
+                    />
+                  ) : (
+                    brand.name
+                  )}
+                </TableCell>
+                <TableCell className="delete-column">
+                  <Button
+                    icon
+                    color="red"
+                    onClick={() => setConfirmDeleteId(brand.id)} // Open confirmation dialog
+                    size="small"
+                  >
+                    <Icon name="trash" />
+                  </Button>
+                </TableCell>
+
               </TableRow>
             ))}
           </TableBody>
+
 
           <TableFooter fullWidth>
             <TableRow>
@@ -123,6 +225,15 @@ export default function Brands(): React.JSX.Element {
             </TableRow>
           </TableFooter>
         </Table>
+
+        {/* Confirmation Dialog */}
+        <Confirm
+          open={confirmDeleteId !== null}
+          header='Delete Brand'
+          content={`Are you sure you want to delete this brand?`}
+          onCancel={cancelDelete}
+          onConfirm={deleteBrand}
+        />
       </div>
     </div>
   );
