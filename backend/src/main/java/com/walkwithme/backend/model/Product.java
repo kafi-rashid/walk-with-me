@@ -20,13 +20,16 @@ public class Product {
 
     private Double price;
 
+    @Lob
+    @Column(columnDefinition = "TEXT") 
     private String image;
-
+    @Column(nullable = true)
     private int quantity;
-
+    @ManyToOne
+    @JoinColumn(name = "seller_id", nullable = true)
+    private UserEntity seller;
     @Column(nullable = false)
     private String status;
-
 
     @ManyToOne
     @JoinColumn(name = "brand_id", nullable = true)

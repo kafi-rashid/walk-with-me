@@ -18,10 +18,6 @@ public interface UserRepository  extends JpaRepository<UserEntity, Long> {
     Optional<UserEntity> findByEmail(@Param("email") String email);
     @Query("SELECT u FROM UserEntity u WHERE u.status = :status")
     List<UserEntity> findAllPendingUser(@Param("status") UserStatus status);
-
-
     @Query("SELECT u FROM UserEntity u JOIN u.roles r WHERE r.name = :role")
     List<UserEntity> findByRoleName(@Param("role") String role);
-    List<UserEntity> findByRoles_Name(String role);
-
 }

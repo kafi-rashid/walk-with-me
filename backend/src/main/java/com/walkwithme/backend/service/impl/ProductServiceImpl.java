@@ -108,48 +108,112 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
-        try {
-            Product product = productRepository.findById(id)
-                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
+//    @Override
+//    public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
+//        try {
+//            Product product = productRepository.findById(id)
+//                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
+//
+//            product.setName(productDTO.getName());
+//            product.setDescription(productDTO.getDescription());
+//            product.setPrice(productDTO.getPrice());
+//            product.setImage(productDTO.getImage());
+//
+//            if (productDTO.getBrandId() != null) {
+//                Brand brand = brandRepository.findById(productDTO.getBrandId())
+//                        .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
+//                product.setBrand(brand);
+//            }
+//
+//            if (productDTO.getParentCategoryId() != null) {
+//                System.out.println("Parent category add"+productDTO.getParentCategoryId());
+//                Category parentCategory = categoryRepository.findById(productDTO.getParentCategoryId())
+//                        .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+//                product.setParentCategory(parentCategory);
+//            }
+//            if (productDTO.getChildCategoryId() != null) {
+//                System.out.println("Child category add"+productDTO.getChildCategoryId());
+//                Category childCategory = categoryRepository.findById(productDTO.getChildCategoryId())
+//                        .orElseThrow(() -> new IllegalArgumentException("Category not found"));
+//                product.setSubCategory(childCategory);
+//            }
+//
+//            if (productDTO.getDiscountId() != null) {
+//                Discount discount = discountRepository.findById(productDTO.getDiscountId())
+//                        .orElseThrow(() -> new IllegalArgumentException("Discount not found"));
+//                product.setDiscount(discount);
+//            }
+//
+//            Product updatedProduct = productRepository.save(product);
+//            return mapToDTO(updatedProduct);
+//        } catch (Exception e) {
+//            throw new IllegalArgumentException("Error updating product: " + e.getMessage());
+//        }
+//    }
+@Override
+public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
+    try {
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
 
-            product.setName(productDTO.getName());
-            product.setDescription(productDTO.getDescription());
-            product.setPrice(productDTO.getPrice());
-            product.setImage(productDTO.getImage());
+        product.setName(productDTO.getName());
+        product.setDescription(productDTO.getDescription());
+        product.setPrice(productDTO.getPrice());
+        product.setImage(productDTO.getImage());
 
-            if (productDTO.getBrandId() != null) {
-                Brand brand = brandRepository.findById(productDTO.getBrandId())
-                        .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
-                product.setBrand(brand);
-            }
-
-            if (productDTO.getParentCategoryId() != null) {
-                System.out.println("Parent category add"+productDTO.getParentCategoryId());
-                Category parentCategory = categoryRepository.findById(productDTO.getParentCategoryId())
-                        .orElseThrow(() -> new IllegalArgumentException("Category not found"));
-                product.setParentCategory(parentCategory);
-            }
-            if (productDTO.getChildCategoryId() != null) {
-                System.out.println("Child category add"+productDTO.getChildCategoryId());
-                Category childCategory = categoryRepository.findById(productDTO.getChildCategoryId())
-                        .orElseThrow(() -> new IllegalArgumentException("Category not found"));
-                product.setSubCategory(childCategory);
-            }
-
-            if (productDTO.getDiscountId() != null) {
-                Discount discount = discountRepository.findById(productDTO.getDiscountId())
-                        .orElseThrow(() -> new IllegalArgumentException("Discount not found"));
-                product.setDiscount(discount);
-            }
-
-            Product updatedProduct = productRepository.save(product);
-            return mapToDTO(updatedProduct);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Error updating product: " + e.getMessage());
+        if (productDTO.getBrandId() != null) {
+            Brand brand = brandRepository.findById(productDTO.getBrandId())
+                    .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
+            product.setBrand(brand);
         }
+
+        if (productDTO.getParentCategoryId() != null) {
+            Category parentCategory = categoryRepository.findById(productDTO.getParentCategoryId())
+                    .orElseThrow(() -> new IllegalArgumentException("Parent category not found"));
+            product.setParentCategory(parentCategory);
+        }
+
+        if (productDTO.getChildCategoryId() != null) {
+            Category childCategory = categoryRepository.findById(productDTO.getChildCategoryId())
+                    .orElseThrow(() -> new IllegalArgumentException("Child category not found"));
+            product.setSubCategory(childCategory);
+        }
+
+        if (productDTO.getDiscountId() != null) {
+            Discount discount = discountRepository.findById(productDTO.getDiscountId())
+                    .orElseThrow(() -> new IllegalArgumentException("Discount not found"));
+            product.setDiscount(discount);
+        }
+
+        if (productDTO.getVariants() != null && !productDTO.getVariants().isEmpty()) {
+            List<ProductVariant> existingVariants = product.getVariants();
+
+            List<ProductVariant> updatedVariants = productDTO.getVariants().stream().map(variantDTO -> {
+                ProductVariant variant = existingVariants.stream()
+                        .filter(v -> v.getId().equals(variantDTO.getId()))
+                        .findFirst()
+                        .orElse(new ProductVariant());
+                variant.setSize(variantDTO.getSize());
+                variant.setPrice(variantDTO.getPrice());
+                variant.setStock(variantDTO.getStockQuantity());
+                variant.setProduct(product);
+                return variant;
+            }).toList();
+
+            existingVariants.removeIf(variant -> updatedVariants.stream().noneMatch(v -> v.getId().equals(variant.getId())));
+
+            product.setVariants(updatedVariants);
+        } else {
+            product.getVariants().clear();
+        }
+
+        Product updatedProduct = productRepository.save(product);
+        return mapToDTO(updatedProduct);
+    } catch (Exception e) {
+        throw new IllegalArgumentException("Error updating product: " + e.getMessage());
     }
+}
+
 
     @Override
     public void deleteProduct(Long id) {
