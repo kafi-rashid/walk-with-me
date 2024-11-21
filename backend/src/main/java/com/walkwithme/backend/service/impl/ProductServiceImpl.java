@@ -48,9 +48,9 @@ public class ProductServiceImpl implements ProductService {
                         .orElseThrow(() -> new IllegalArgumentException("Brand not found with ID: " + productDTO.getBrandId()));
                 product.setBrand(brand);
             }
-            if (productDTO.getSelleId() != null) {
-                UserEntity user = userRepository.findById(productDTO.getSelleId())
-                        .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + productDTO.getSelleId()));
+            if (productDTO.getSellerId() != null) {
+                UserEntity user = userRepository.findById(productDTO.getSellerId())
+                        .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + productDTO.getSellerId()));
                 product.setSeller(user);
             }
 
@@ -196,8 +196,8 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                     .orElseThrow(() -> new IllegalArgumentException("Discount not found"));
             product.setDiscount(discount);
         }
-        if (productDTO.getSelleId() != null) {
-            UserEntity seller = userRepository.findById(productDTO.getSelleId())
+        if (productDTO.getSellerId() != null) {
+            UserEntity seller = userRepository.findById(productDTO.getSellerId())
                     .orElseThrow(() -> new IllegalArgumentException("Discount not found"));
             product.setSeller(seller);
         }
@@ -347,7 +347,7 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                         Collections.emptyList())
                 .parentCategoryId(product.getParentCategory() != null ? product.getParentCategory().getId() : null)
                 .discountId(product.getDiscount() != null ? product.getDiscount().getId() : null)
-                .selleId(product.getSeller().getId()!=null ? product.getSeller().getId() : null)
+                .sellerId(product.getSeller().getId()!=null ? product.getSeller().getId() : null)
                 .build();
     }
     private ProductListDto mapToListDTO(Product product) {

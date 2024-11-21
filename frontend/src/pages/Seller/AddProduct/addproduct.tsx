@@ -15,6 +15,7 @@ import {
   TextArea,
 } from 'semantic-ui-react';
 import useAxios from '../../../shared/axios';
+import { UserContext } from '../../../store/UserContext';
 
 export default function AddProduct(): React.JSX.Element {
   const [name, setName] = React.useState<string>('');
@@ -28,6 +29,8 @@ export default function AddProduct(): React.JSX.Element {
   const [brands, setBrands] = React.useState([]);
   const [categories, setCategories] = React.useState([]);
   const [subcategories, setSubcategories] = React.useState([]);
+
+  const { user } = React.useContext(UserContext);
 
   const axios = useAxios();
 
@@ -87,6 +90,7 @@ export default function AddProduct(): React.JSX.Element {
       parentCategoryId,
       childCategoryId,
       variants,
+      sellerId: user?.userId ?? null
     };
     axios.post('/products', payload)
       .then(({ data }) => {
@@ -125,16 +129,6 @@ export default function AddProduct(): React.JSX.Element {
         </Form.Field>
 
         <Form.Field>
-          <label>Brand</label>
-          <Dropdown
-            placeholder="Select Brand"
-            selection
-            options={brands.map((brand) => ({ key: brand.id, value: brand.id, text: brand.name }))}
-            onChange={(e, { value }) => setBrandId(value as number)}
-          />
-        </Form.Field>
-
-        <Form.Field>
           <label>Category</label>
           <Dropdown
             placeholder="Select Category"
@@ -159,6 +153,16 @@ export default function AddProduct(): React.JSX.Element {
             />
           </Form.Field>
         }
+
+        <Form.Field>
+          <label>Brand</label>
+          <Dropdown
+            placeholder="Select Brand"
+            selection
+            options={brands.map((brand) => ({ key: brand.id, value: brand.id, text: brand.name }))}
+            onChange={(e, { value }) => setBrandId(value as number)}
+          />
+        </Form.Field>
         
         <label className='font-weight-bold'>Variants</label>
 
