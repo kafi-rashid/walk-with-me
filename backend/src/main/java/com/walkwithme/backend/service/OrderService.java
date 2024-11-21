@@ -12,8 +12,8 @@ public interface OrderService {
     List<OrderDTO> getAllOrdersByUser(Long userId);
     OrderDTO updateOrder(Long id, OrderDTO orderDTO);
     void deleteOrder(Long id);
-    void changeOrderStatus(Long id, OrderStatus status);
-    void cancelOrder(Long orderId, Long sellerId);
+    String changeOrderStatus(Long id, OrderStatus status);
+    String cancelOrder(Long orderId, Long userId);
 /*
     void updateOrderStatus(Long orderId, Long sellerId, OrderStatus newStatus);
 */

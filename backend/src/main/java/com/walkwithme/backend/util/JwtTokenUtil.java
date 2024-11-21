@@ -53,7 +53,6 @@ public class JwtTokenUtil {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("roles",userDetails.getAuthorities());
-
         return doGenerateToken(claims, userDetails.getUsername());
     }
 
@@ -63,7 +62,7 @@ public class JwtTokenUtil {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+//                .setExpiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
     }
@@ -145,7 +144,7 @@ public class JwtTokenUtil {
     }
 
 
-    public String getUsernameFromToken(String token) {
+    public String getEmailFromToken(String token) {
         String result = null;
         try {
             result = Jwts.parser()
