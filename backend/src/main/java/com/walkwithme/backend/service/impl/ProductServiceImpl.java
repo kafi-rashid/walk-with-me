@@ -170,6 +170,14 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    public void updateStock(Long productId, int newQuantity) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        product.updateQuantity(newQuantity);
+        productRepository.save(product);
+    }
+
     @Override
     public ProductDetailDTO getProductDetailsForEdit(Long productId) {
         List<BrandDTO> brands = brandRepository.findAll().stream()
