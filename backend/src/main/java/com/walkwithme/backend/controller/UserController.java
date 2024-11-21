@@ -13,7 +13,7 @@ import java.util.List;
 public class UserController {
     @Autowired
     private UserService userService;
-    @GetMapping("/")
+    @GetMapping
     public List<UserDto> findAllUser()
     {
         return userService.findAll();

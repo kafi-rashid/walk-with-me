@@ -3,6 +3,7 @@ package com.walkwithme.backend.controller;
 import com.walkwithme.backend.dto.BrandDTO;
 import com.walkwithme.backend.dto.ProductDTO;
 import com.walkwithme.backend.dto.ProductDetailDTO;
+import com.walkwithme.backend.dto.ProductListDto;
 import com.walkwithme.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,7 +24,7 @@ public class ProductController {
         ProductDTO createdProduct = productService.createProduct(productDTO);
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
-    @GetMapping("create-or-edit/{id}")
+    @GetMapping("/create-or-edit/{id}")
     public ResponseEntity<ProductDetailDTO> getProductDetailsForEdit(@PathVariable Long id) {
         ProductDetailDTO product = productService.getProductDetailsForEdit(id);
         return new ResponseEntity<>(product, HttpStatus.OK);
@@ -35,9 +36,9 @@ public class ProductController {
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
-    @GetMapping("/")
-    public ResponseEntity<List<ProductDTO>> getAllProducts() {
-        List<ProductDTO> products = productService.getAllProducts();
+    @GetMapping
+    public ResponseEntity<List<ProductListDto>> getAllProducts() {
+        List<ProductListDto> products = productService.getAllProducts();
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 
