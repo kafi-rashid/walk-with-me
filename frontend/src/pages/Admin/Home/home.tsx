@@ -17,28 +17,31 @@ export default function AdminHome(): React.JSX.Element {
     return (
         <div className='container'>
             <div className='header'>
-                <ul>
-                    <li>
-                        <NavLink to='/admin/sellers'>Sellers</NavLink>
-                    </li>
-                    <li>
-                        <NavLink to='/admin/reviews'>Reviews</NavLink>
-                    </li>
-                    <li>
-                        Config
-                        <ul>
-                            <li onClick={ () => navigate('/admin/categories') }>
-                                Categories
-                            </li>
-                            <li onClick={ () => navigate('/admin/brands') }>
-                                Brands
-                            </li>
-                            <li onClick={ () => navigate('/admin/attributes') }>
-                                Attributes
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+                <div className='d-flex align-items-center'>
+                    <p className='m-0 p-0 logo mr-3'>Walk with Me</p>
+                    <ul>
+                        <li>
+                            <NavLink to='/admin/sellers'>Sellers</NavLink>
+                        </li>
+                        <li>
+                            <NavLink to='/admin/reviews'>Reviews</NavLink>
+                        </li>
+                        <li>
+                            Config
+                            <ul>
+                                <li onClick={ () => navigate('/admin/categories') }>
+                                    Categories
+                                </li>
+                                <li onClick={ () => navigate('/admin/brands') }>
+                                    Brands
+                                </li>
+                                <li onClick={ () => navigate('/admin/attributes') }>
+                                    Attributes
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
                 <ul>
                     <li>
                         <NavLink to='/admin/profile'>Profile</NavLink>

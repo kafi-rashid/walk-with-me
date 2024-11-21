@@ -13,7 +13,11 @@
             flex-direction: row;
 
             li {
-                margin: 0 20px;
+                padding: 0 20px;
+
+                ul li {
+                    padding: 10px 20px;
+                }
             }
         }
     }
@@ -58,10 +62,9 @@
     color: #564646;
 }
 
-.header * {
+.header *:not(.logo) {
     cursor: pointer;
     font-weight: 500 !important;
-    text-transform: uppercase;
 }
 
 .header ul {
