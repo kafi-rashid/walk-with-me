@@ -199,6 +199,14 @@ p {
     align-items: center;
 }
 
+.flex-direction-column {
+    flex-direction: column;
+}
+
+.flex-direction-row {
+    flex-direction: row;
+}
+
 .anchor {
     text-decoration: underline;
 
@@ -217,4 +225,20 @@ p {
 
 .text-right {
     text-align: right !important;
+}
+
+.border {
+    border: thin dashed red;
+}
+
+.font-weight-bold {
+    font-weight: bold;
+}
+
+.font-weight-normal {
+    font-weight: 400;
+}
+
+.font-weight-light {
+    font-weight: 100;
 }

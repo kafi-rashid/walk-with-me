@@ -1,6 +1,5 @@
 .login-container {
     display: flex;
-    // border: thin dashed red;
     height: 100vh;
     background-color: #fffff1;
     background-image: 
@@ -31,14 +30,13 @@
 
     .input-container {
         width: 40%;
-        // border: thin dashed red;
         padding: 20px;
 
         .inner {
             background-color: #ffffffc1;
             height: 100%;
             border-radius: 15px;
-            overflow: hidden;
+            overflow: auto;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -58,15 +56,11 @@
                 margin-bottom: 20px;
             }
 
-            .input-field {
-
-            }
-
             .input-field,
             .action-button {
                 width: 80%;
                 max-width: 300px;
-                margin-bottom: 15px;
+                // margin-bottom: 15px;
             }
 
             .forgot-button {
