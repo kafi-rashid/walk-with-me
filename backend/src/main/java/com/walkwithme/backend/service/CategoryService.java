@@ -18,4 +18,6 @@ public interface CategoryService {
 
     List<CategoryDTO> getCategoriesByParentId(Long id);
 
+    public List<CategoryDTO> getCategoriesWithoutParent();
+
 }

@@ -47,5 +47,10 @@ public class CategoryController {
         List<CategoryDTO> categories = categoryService.getCategoriesByParentId(id);
         return ResponseEntity.ok(categories);
     }
+
+    @GetMapping("/primary-categories")
+    public ResponseEntity<List<CategoryDTO>> getCategoriesWithoutParent() {
+        return ResponseEntity.ok(categoryService.getCategoriesWithoutParent());
+    }
 }
 

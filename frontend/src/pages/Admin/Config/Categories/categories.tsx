@@ -16,6 +16,7 @@ import {
   Confirm, // Import Confirm component
 } from 'semantic-ui-react';
 import useAxios from '../../../../shared/axios';
+import { NavLink } from 'react-router-dom';
 
 interface Category {
   id: number;
@@ -167,17 +168,18 @@ export default function Categories(): React.JSX.Element {
               <TableRow key={category.id}>
                 <TableCell>{category.id}</TableCell>
                 <TableCell onDoubleClick={() => startEditing(category.id, category.name)}>
-                  {editingCategoryId === category.id ? (
-                    <Input
-                      value={editingName}
-                      onChange={(e) => setEditingName(e.target.value)}
-                      onBlur={() => saveEdit(category.id)}
-                      onKeyDown={(e) => handleKeyDown(e, category.id)}
-                      autoFocus
-                    />
-                  ) : (
-                    category.name
-                  )}
+                  {
+                    editingCategoryId === category.id ? (
+                      <Input
+                        value={editingName}
+                        onChange={(e) => setEditingName(e.target.value)}
+                        onBlur={() => saveEdit(category.id)}
+                        onKeyDown={(e) => handleKeyDown(e, category.id)}
+                        autoFocus
+                      />
+                    ) :
+                    <NavLink to={ '/admin/categories/' + category.id }>{ category.name }</NavLink>
+                  }
                 </TableCell>
                 <TableCell style={{ width: '50px' }}>
                   <Button
