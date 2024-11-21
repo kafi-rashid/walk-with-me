@@ -209,6 +209,8 @@ p {
 
 .anchor {
     text-decoration: underline;
+    padding: 0 !important;
+    margin: 0 !important;
 
     &:hover {
         text-decoration: underline;
@@ -241,4 +243,10 @@ p {
 
 .font-weight-light {
     font-weight: 100;
+}
+  
+.product-list-image {
+    width: 50px;
+    margin: 0;
+    padding: 0;
 }

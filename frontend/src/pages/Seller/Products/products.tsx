@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Divider,
   TableRow,
@@ -14,14 +14,16 @@ import {
   Menu,
   MenuItem
 } from 'semantic-ui-react';
+import useAxios from '../../../shared/axios';
 
 interface Product {
   id: number;
   name: string;
+  image: string;
   price: number;
-  brand: string;
-  category: string;
-  subcategory: string;
+  brand: { id: number, name: string };
+  parentCategory: { id: number, name: string, parentId: number };
+  childCategory: { id: number, name: string, parentId: number };
   stockLeft: number;
 }
 
@@ -33,6 +35,19 @@ export default function Products(): React.JSX.Element {
     navigate('/seller/products/add');
   };
 
+  const axios = useAxios();
+
+  React.useEffect(() => {
+    axios.get('/products')
+      .then(({ data }) => {
+        setProducts(data);
+        console.log(data)
+      })
+      .catch((error) => {
+        console.log("Error", error);
+      });
+  }, []);
+  
   return (
     <div className='manage-page'>
       <div className='d-flex justify-content-between'>
@@ -50,16 +65,16 @@ export default function Products(): React.JSX.Element {
 
       <Divider />
       <div className="page-content">
-        <Table compact celled>
+        <Table compact>
           <TableHeader>
             <TableRow>
-              <TableHeaderCell>ID</TableHeaderCell>
+              <TableHeaderCell style={{ width: '50px' }}>ID</TableHeaderCell>
+              <TableHeaderCell style={{ width: '80px' }}>Image</TableHeaderCell>
               <TableHeaderCell>Name</TableHeaderCell>
-              <TableHeaderCell>Price</TableHeaderCell>
+              <TableHeaderCell style={{ width: '100px' }}>Price</TableHeaderCell>
               <TableHeaderCell>Brand</TableHeaderCell>
               <TableHeaderCell>Category</TableHeaderCell>
               <TableHeaderCell>Subcategory</TableHeaderCell>
-              <TableHeaderCell>Stock Left</TableHeaderCell>
             </TableRow>
           </TableHeader>
 
@@ -67,12 +82,18 @@ export default function Products(): React.JSX.Element {
             {products.map(product => (
               <TableRow key={product.id}>
                 <TableCell>{product.id}</TableCell>
-                <TableCell>{product.name}</TableCell>
+                <TableCell>
+                  <img className='product-list-image' src={product.image} alt="Product" />
+                </TableCell>
+                <TableCell>
+                  <NavLink className="anchor" to={ '/seller/products/' + product.id }>
+                    {product.name}
+                  </NavLink>
+                </TableCell>
                 <TableCell>${product.price.toFixed(2)}</TableCell>
-                <TableCell>{product.brand}</TableCell>
-                <TableCell>{product.category}</TableCell>
-                <TableCell>{product.subcategory}</TableCell>
-                <TableCell>{product.stockLeft}</TableCell>
+                <TableCell>{product.brand.name}</TableCell>
+                <TableCell>{product.parentCategory.name}</TableCell>
+                <TableCell>{product.childCategory.name}</TableCell>
               </TableRow>
             ))}
           </TableBody>
