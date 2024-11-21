@@ -1,4 +1,4 @@
-.header {
+.page-header {
     height: 80px;
     position: fixed;
     left: 20px;
@@ -14,11 +14,11 @@
     backdrop-filter: blur(10px);
 }
 
-.header * {
+.page-header * {
     color: #564646;
 }
 
-.header .logo {
+.page-header .logo {
     font-weight: 900;
     font-size: 24px;
     font-family: 'Dosis';
@@ -26,13 +26,13 @@
     text-transform: unset !important;
 }
 
-.header li {
+.page-header li {
     cursor: pointer;
     font-weight: 500 !important;
     text-transform: uppercase;
 }
 
-.header .menu ul {
+.page-header .menu ul {
     list-style-type: none;
     padding: 0;
     margin: 0;
@@ -40,7 +40,7 @@
     flex-direction: row;
 }
 
-.header .menu ul li:not(.menu ul li ul li) {
+.page-header .menu ul li:not(.menu ul li ul li) {
     position: relative;
     height: 80px;
     display: flex;
@@ -49,7 +49,7 @@
     padding: 0 20px;
 }
 
-.header .menu ul ul {
+.page-header .menu ul ul {
     display: none;
     position: absolute;
     top: 100%;
@@ -60,25 +60,25 @@
     backdrop-filter: blur(10px);
 }
 
-.header .menu li:hover {
+.page-header .menu li:hover {
     background-color: #ffffff43;
 }
 
-.header .menu li:hover > ul {
+.page-header .menu li:hover > ul {
     display: block;
 }
 
-.header .menu ul ul li {
+.page-header .menu ul ul li {
     display: block;
     padding: 15px 20px;
     color: #000;
 }
 
-.header .menu ul ul li:hover {
+.page-header .menu ul ul li:hover {
     background-color: rgba(160, 160, 160, 0.194);
 }
 
-.header .user {
+.page-header .user {
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -153,7 +153,7 @@
     }
 }
 
-.header .user .avatar {
+.page-header .user .avatar {
     height: 40px;
     width: 40px;
     border-radius: 50%;
@@ -161,7 +161,7 @@
     margin-right: 15px;
 }
 
-.header .user button {
+.page-header .user button {
     background-color: transparent;
     outline: none;
     border: none;

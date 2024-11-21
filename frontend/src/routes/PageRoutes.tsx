@@ -13,6 +13,7 @@ import Orders from "../pages/Seller/Orders/orders";
 import Categories from "../pages/Admin/Config/Categories/categories";
 import Brands from "../pages/Admin/Config/Brands/brands";
 import Attributes from "../pages/Admin/Config/Attributes/attributes";
+import SubCategories from "../pages/Admin/Config/SubCategories/subcategories";
 
 export const AuthRoutes: React.FC = () => {
     return (
@@ -40,6 +41,7 @@ export const AdminRoutes: React.FC = () => {
                 <Route path="sellers" element={ <Sellers/> } />
                 <Route path="reviews" element={ <Reviews/> } />
                 <Route path="categories" element={ <Categories/> } />
+                <Route path="categories/:parentId" element={ <SubCategories/> } />
                 <Route path="brands" element={ <Brands/> } />
                 <Route path="attributes" element={ <Attributes/> } />
             </Route>

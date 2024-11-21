@@ -41,5 +41,16 @@ public class CategoryController {
         categoryService.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/{id}/sub-categories")
+    public ResponseEntity<List<CategoryDTO>> getCategoriesByParentId(@PathVariable Long id) {
+        List<CategoryDTO> categories = categoryService.getCategoriesByParentId(id);
+        return ResponseEntity.ok(categories);
+    }
+
+    @GetMapping("/primary-categories")
+    public ResponseEntity<List<CategoryDTO>> getCategoriesWithoutParent() {
+        return ResponseEntity.ok(categoryService.getCategoriesWithoutParent());
+    }
 }
 

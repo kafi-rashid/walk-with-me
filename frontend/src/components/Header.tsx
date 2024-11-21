@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import './Header.scss';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../shared/utils';
@@ -13,12 +13,16 @@ export default function Header(): React.JSX.Element {
         setShowOptions((prevState) => !prevState);
     };
 
+    useEffect(() => {
+        console.log(user)
+    })
+
     const handleLogout = () => {
         logout(setUser, navigate);
     }
 
     return (
-        <div className='header'>
+        <div className='page-header'>
             <p className='logo' onClick={() => navigate('/')}>Walk with Me</p>
 
             <div className='menu'>
@@ -61,7 +65,7 @@ export default function Header(): React.JSX.Element {
                     <span className="material-icons">shopping_cart</span>
                     <span className='counter'>4</span>
                 </button>
-                <p className='greetings'>Hello Kafi Rashid</p>
+                <p className='greetings'>Hello { user?.firstName } { user?.lastName }!</p>
                 <button onClick={toggleOptions}>
                     <span className="material-icons">
                         { showOptions ? 'keyboard_arrow_up' : 'keyboard_arrow_down' }

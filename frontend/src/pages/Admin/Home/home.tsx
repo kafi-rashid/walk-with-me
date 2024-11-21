@@ -16,7 +16,7 @@ export default function AdminHome(): React.JSX.Element {
 
     return (
         <div className='container'>
-            <div className='header'>
+            <div className='page-header'>
                 <div className='d-flex align-items-center'>
                     <p className='m-0 p-0 logo mr-3'>Walk with Me</p>
                     <ul>

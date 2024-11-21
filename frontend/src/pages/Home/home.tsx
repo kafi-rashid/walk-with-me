@@ -13,10 +13,26 @@ import Nike from '../../assets/images/brands/nike.png';
 import Puma from '../../assets/images/brands/puma.png';
 import Adidas from '../../assets/images/brands/adidas.png';
 import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../../store/UserContext';
+
+import useAxios from '../../shared/axios';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Home(): React.JSX.Element {
 
     const navigate = useNavigate();
+    const { user, setUser } = React.useContext(UserContext);
+    const axiosInstance = useAxios();
+
+    React.useEffect(() => {
+        axiosInstance.get(API_URL + '/users/')
+            .then(({data}) => {
+                console.log(data);
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+    }, []);
 
     return (
         <div className='container home'>

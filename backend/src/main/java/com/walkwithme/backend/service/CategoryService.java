@@ -15,4 +15,9 @@ public interface CategoryService {
     CategoryDTO updateCategory(Long id, CategoryDTO category);
 
     void deleteCategory(Long id);
+
+    List<CategoryDTO> getCategoriesByParentId(Long id);
+
+    public List<CategoryDTO> getCategoriesWithoutParent();
+
 }
