@@ -48,6 +48,16 @@ public class ProductController {
         return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
     }
 
+    @PutMapping("/{productId}/stock")
+    public ResponseEntity<String> updateStock(@PathVariable Long productId, @RequestParam int newQuantity) {
+        try {
+            productService.updateStock(productId, newQuantity);
+            return ResponseEntity.ok("Stock updated successfully");
+        } catch (RuntimeException ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
