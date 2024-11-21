@@ -87,4 +87,15 @@ public class CategoryServiceImpl implements CategoryService {
                 .parentId(category.getParentId() != null ? category.getParentId() : null)
                 .build();
     }
+
+    public List<CategoryDTO> getCategoriesByParentId(Long id) {
+        try {
+            List<Category> categories = categoryRepository.findByParentId(id);
+            return categories.stream()
+                    .map(this::mapToDTO)
+                    .collect(Collectors.toList());
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error retrieving categories by parentId: " + e.getMessage());
+        }
+    }
 }
