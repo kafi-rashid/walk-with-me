@@ -96,6 +96,52 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
     }
 
+    @Override
+    public void cancelOrder(Long orderId, Long sellerId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        if (!order.getUser().getId().equals(sellerId)) {
+            throw new RuntimeException("You do not have permission to cancel this order");
+        }
+
+        if (order.getStatus() == OrderStatus.DELIVERED || order.getStatus() == OrderStatus.CANCELLED) {
+            throw new RuntimeException("Cannot cancel a delivered or already canceled order");
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+
+        orderRepository.save(order);
+    }
+
+   /* @Override
+    public void updateOrderStatus(Long orderId, Long sellerId, OrderStatus newStatus) {
+        // Retrieve the order from the database
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        // Check if the logged-in seller is the one managing the order
+        if (!order.getUser().getId().equals(sellerId)) {
+            throw new RuntimeException("You do not have permission to update this order");
+        }
+
+        // Prevent updating the order if it's already delivered or canceled
+        if (order.getStatus() == OrderStatus.DELIVERED || order.getStatus() == OrderStatus.CANCELLED) {
+            throw new RuntimeException("Cannot update a delivered or canceled order");
+        }
+
+        // Prevent setting an invalid status transition
+        if (newStatus == OrderStatus.CANCELLED) {
+            throw new RuntimeException("Order cannot be marked as CANCELLED here, use the cancel action instead");
+        }
+
+        // Update the order status
+        order.setStatus(newStatus);
+
+        // Save the updated order
+        orderRepository.save(order);
+    }
+*/
     private OrderDTO mapToDTO(Order order) {
         List<OrderItemDTO> itemDTOs = order.getItems().stream()
                 .map(item -> OrderItemDTO.builder()
