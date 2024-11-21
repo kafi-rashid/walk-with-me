@@ -1,8 +1,6 @@
 package com.walkwithme.backend.filter;
 import com.walkwithme.backend.config.CustomUserDetailsService;
-import com.walkwithme.backend.config.JWTGenerator;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
+import com.walkwithme.backend.util.JwtTokenUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -21,7 +19,7 @@ import java.io.IOException;
 public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
-    private JWTGenerator tokenGenerator;
+    private JwtTokenUtil tokenGenerator;
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
@@ -32,7 +30,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain) throws ServletException, IOException {
         String token = getJWTFromRequest(request);
         if(StringUtils.hasText(token) && tokenGenerator.validateToken(token)) {
-            String email = tokenGenerator.getUsernameFromJWT(token);
+            String email = tokenGenerator.getEmailFromToken(token);
 
             UserDetails userDetails = customUserDetailsService.loadUserByUsername(email);
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, null,

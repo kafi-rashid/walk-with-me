@@ -24,7 +24,7 @@ public class UserController {
         return userService.findAllPendingUser();
     }
     @DeleteMapping("/{id}")
-    public String deleById(@PathVariable Long id)
+    public String deleteById(@PathVariable Long id)
     {
         return userService.deleteById(id);
     }

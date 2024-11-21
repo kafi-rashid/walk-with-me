@@ -33,8 +33,8 @@ public class OrderController {
         List<OrderDTO> orders = orderService.getAllOrders();
         return ResponseEntity.ok(orders);
     }
-    @GetMapping("/by-user/{userId}")
-    public ResponseEntity<List<OrderDTO>> getAllOrdersByUser(Long userId) {
+    @GetMapping("/by-user")
+    public ResponseEntity<List<OrderDTO>> getAllOrdersByUser(@RequestParam Long userId) {
         List<OrderDTO> orders = orderService.getAllOrdersByUser(userId);
         return ResponseEntity.ok(orders);
     }
@@ -59,8 +59,8 @@ public class OrderController {
 
 
     @PutMapping("/{orderId}/cancel")
-    public ResponseEntity<String> cancelOrder(@PathVariable Long orderId, @RequestParam Long sellerId) {
-        orderService.cancelOrder(orderId, sellerId);
+    public ResponseEntity<String> cancelOrder(@PathVariable Long orderId, @RequestParam Long userId) {
+        orderService.cancelOrder(orderId, userId);
         return ResponseEntity.ok("Order canceled successfully");
     }
 

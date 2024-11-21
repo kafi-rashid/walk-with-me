@@ -37,8 +37,8 @@ public class OrderServiceImpl implements OrderService {
         order.setUser(user);
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(orderDTO.getTotalAmount());
-        order.setShippingAddress(orderDTO.getShippingAddress());
-        order.setBillingAddress(orderDTO.getBillingAddress());
+//        order.setShippingAddress(orderDTO.getShippingAddress());
+//        order.setBillingAddress(orderDTO.getBillingAddress());
 
         Order savedOrder = orderRepository.save(order);
 
@@ -99,8 +99,8 @@ public class OrderServiceImpl implements OrderService {
 
         order.setStatus(orderDTO.getStatus());
         order.setTotalAmount(orderDTO.getTotalAmount());
-        order.setShippingAddress(orderDTO.getShippingAddress());
-        order.setBillingAddress(orderDTO.getBillingAddress());
+//        order.setShippingAddress(orderDTO.getShippingAddress());
+//        order.setBillingAddress(orderDTO.getBillingAddress());
 
         orderRepository.save(order);
         return mapToDTO(order);
@@ -114,29 +114,58 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void changeOrderStatus(Long id, OrderStatus status) {
+    public String changeOrderStatus(Long id, OrderStatus status) {
         Order order = orderRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Order not found with ID: " + id));
+
+        if (order.getStatus() == status) {
+            return "The order is already in the status: " + status + ".";
+        }
+
         order.setStatus(status);
         orderRepository.save(order);
+
+        return "Order status updated to " + status + " successfully.";
     }
 
     @Override
-    public void cancelOrder(Long orderId, Long sellerId) {
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
+    public String cancelOrder(Long orderId, Long userId) {
+        UserEntity user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
 
-        if (!order.getUser().getId().equals(sellerId)) {
-            throw new RuntimeException("You do not have permission to cancel this order");
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Order not found with ID: " + orderId));
+
+        boolean isSeller = user.getRoles().stream()
+                .anyMatch(role -> "seller".equalsIgnoreCase(role.getName()));
+
+        if (isSeller) {
+            if (order.getStatus() == OrderStatus.CANCELLED) {
+                return "This order has already been cancelled.";
+            }
+
+            order.setStatus(OrderStatus.CANCELLED);
+            orderRepository.save(order);
+            return "Order with ID: " + orderId + " has been successfully cancelled by the seller.";
         }
 
-        if (order.getStatus() == OrderStatus.DELIVERED || order.getStatus() == OrderStatus.CANCELLED) {
-            throw new RuntimeException("Cannot cancel a delivered or already canceled order");
+        if (!order.getUser().getId().equals(userId)) {
+            return "You do not have permission to cancel this order.";
+        }
+
+        if (order.getStatus() == OrderStatus.SHIPPED ||
+                order.getStatus() == OrderStatus.ON_THE_WAY ||
+                order.getStatus() == OrderStatus.DELIVERED) {
+            return "You cannot cancel this order as it has already been shipped.";
+        }
+
+        if (order.getStatus() == OrderStatus.CANCELLED) {
+            return "This order has already been cancelled.";
         }
 
         order.setStatus(OrderStatus.CANCELLED);
-
         orderRepository.save(order);
+        return "Order with ID: " + orderId + " has been successfully cancelled by the buyer.";
     }
 
     private OrderItemDTO mapOrderItemToDTO(OrderItem orderItem) {
@@ -166,8 +195,8 @@ public class OrderServiceImpl implements OrderService {
                 .items(itemDTOs)
                 .status(order.getStatus())
                 .totalAmount(order.getTotalAmount())
-                .shippingAddress(order.getShippingAddress())
-                .billingAddress(order.getBillingAddress())
+//                .shippingAddress(order.getShippingAddress())
+//                .billingAddress(order.getBillingAddress())
                 .build();
     }
 }

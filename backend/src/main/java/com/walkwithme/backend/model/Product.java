@@ -22,6 +22,12 @@ public class Product {
 
     private String image;
 
+    private int quantity;
+
+    @Column(nullable = false)
+    private String status;
+
+
     @ManyToOne
     @JoinColumn(name = "brand_id", nullable = true)
     private Brand brand;
@@ -37,4 +43,9 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "discount_id", nullable = true)
     private Discount discount;
+
+    public void updateQuantity(int newQuantity) {
+        this.quantity = newQuantity;
+        this.status = (newQuantity > 0) ? "In Stock" : "Out of Stock";
+    }
 }

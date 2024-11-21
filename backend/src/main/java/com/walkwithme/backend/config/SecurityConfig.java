@@ -37,18 +37,21 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        System.out.println(http+"piku token");
         http
                 .csrf(csrf -> csrf.disable())
                 .cors(Customizer.withDefaults())
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers("/api/authenticate/**").permitAll()
-////                        .requestMatchers("/api/authenticate/users").hasRole("Admin")
-//                        .requestMatchers("/api/products").hasAnyRole("Seller", "Admin")
-//                        .requestMatchers("/api/brands").hasAnyRole("Seller", "Admin")
-//                        .requestMatchers("/api/categories").hasAnyRole("Seller", "Admin")
-//                        .requestMatchers("/api/discounts").hasAnyRole("Seller", "Admin")
-//                        .anyRequest().authenticated()
-//                )
+               .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/authenticate/**").permitAll()
+//                        .requestMatchers("/api/authenticate/users").hasRole("Admin")
+                        .requestMatchers("/api/products")
+                        .hasAnyRole("seller")
+
+                        .requestMatchers("/api/brands").hasAnyRole("seller", "Admin")
+                        .requestMatchers("/api/categories").hasAnyRole("seller", "Admin")
+                        .requestMatchers("/api/discounts").hasAnyRole("seller", "Admin")
+                        .anyRequest().authenticated()
+                )
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(authEntryPoint)
                 )
