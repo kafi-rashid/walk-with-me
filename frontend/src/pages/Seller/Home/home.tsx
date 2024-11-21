@@ -16,14 +16,17 @@ export default function SellerHome(): React.JSX.Element {
     return (
         <div className='container'>
             <div className='header'>
-                <ul>
-                    <li>
-                        <NavLink to='/seller/products'>Products</NavLink>
-                    </li>
-                    <li>
-                        <NavLink to='/seller/orders'>Orders</NavLink>
-                    </li>
-                </ul>
+                <div className='d-flex align-items-center'>
+                    <p className='m-0 p-0 logo mr-3'>Walk with Me</p>
+                    <ul>
+                        <li>
+                            <NavLink to='/seller/products'>Products</NavLink>
+                        </li>
+                        <li>
+                            <NavLink to='/seller/orders'>Orders</NavLink>
+                        </li>
+                    </ul>
+                </div>
                 <ul>
                     <li>
                         <NavLink to='/seller/profile'>Profile</NavLink>

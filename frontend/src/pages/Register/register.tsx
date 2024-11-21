@@ -119,7 +119,9 @@ export default function Register(): React.JSX.Element {
                         <p className='sign-up-here'>
                             Or log in <NavLink to={'/public/login'}>here</NavLink>
                         </p>
-                        <p className='disclaimer'>By creating an account you agree to Walk with Me's Terms of Services and Privacy Policy</p>
+                        <p className='disclaimer'>
+                            By creating an account you agree to Walk with Me's Terms of Services and Privacy Policy
+                        </p>
                     </div>
                 </div>
             </div>
