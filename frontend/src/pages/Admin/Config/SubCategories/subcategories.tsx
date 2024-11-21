@@ -52,6 +52,11 @@ export default function SubCategories(): React.JSX.Element {
   };
 
   const saveEdit = (subcategoryId: number) => {
+    if (editingName.trim().length === 0) {
+        setEditingSubcategoryId(null);
+        setEditingName('');
+        return;
+    }
     axios.put(`/categories/${subcategoryId}`, { name: editingName, parentId })
       .then(() => {
         setSubcategories((prevSubcategories) =>
@@ -80,6 +85,10 @@ export default function SubCategories(): React.JSX.Element {
   };
 
   const saveNewSubcategory = () => {
+    if (newSubcategoryName.trim().length === 0) {
+        setIsAddingSubcategory(false);
+        return;
+    }
     axios.post('/categories', { name: newSubcategoryName, parentId })
       .then(({ data }) => {
         setSubcategories((prevSubcategories) => [data, ...prevSubcategories]);
@@ -119,7 +128,7 @@ export default function SubCategories(): React.JSX.Element {
           <TableHeader>
             <TableRow>
               <TableHeaderCell style={{ width: '50px' }}>ID</TableHeaderCell>
-              <TableHeaderCell colSpan={ 2 } className='d-flex align-items-center justify-content-between' style={{ width: 'calc(100% + 65px)' }}> 
+              <TableHeaderCell colSpan={ 2 } className='d-flex align-items-center justify-content-between' style={{ width: subcategories.length > 0 ? 'calc(100% + 65px)' : '' }}> 
                 Name
                 <Button
                   icon
@@ -148,36 +157,44 @@ export default function SubCategories(): React.JSX.Element {
                     autoFocus
                   />
                 </TableCell>
-                <TableCell></TableCell>
               </TableRow>
             )}
-            {subcategories.map((subcategory) => (
-              <TableRow key={subcategory.id}>
-                <TableCell>{subcategory.id}</TableCell>
-                <TableCell onDoubleClick={() => startEditing(subcategory.id, subcategory.name)}>
-                  {editingSubcategoryId === subcategory.id ? (
-                    <Input
-                      value={editingName}
-                      onChange={(e) => setEditingName(e.target.value)}
-                      onBlur={() => saveEdit(subcategory.id)}
-                      onKeyDown={(e) => handleKeyDown(e, subcategory.id)}
-                      autoFocus
-                    />
-                  ) : (
-                    subcategory.name
-                  )}
-                </TableCell>
-                <TableCell style={{ width: '50px' }}>
-                  <Button
-                    icon
-                    color='red'
-                    onClick={() => deleteSubcategory(subcategory.id)}
-                  >
-                    <Icon name='trash' />
-                  </Button>
-                </TableCell>
-              </TableRow>
-            ))}
+            {
+                subcategories.map((subcategory) => (
+                    <TableRow key={subcategory.id}>
+                        <TableCell>{subcategory.id}</TableCell>
+                        <TableCell onDoubleClick={() => startEditing(subcategory.id, subcategory.name)}>
+                        {editingSubcategoryId === subcategory.id ? (
+                            <Input
+                            value={editingName}
+                            onChange={(e) => setEditingName(e.target.value)}
+                            onBlur={() => saveEdit(subcategory.id)}
+                            onKeyDown={(e) => handleKeyDown(e, subcategory.id)}
+                            autoFocus
+                            />
+                        ) : (
+                            subcategory.name
+                        )}
+                        </TableCell>
+                        <TableCell style={{ width: '50px' }}>
+                        <Button
+                            icon
+                            color='red'
+                            onClick={() => deleteSubcategory(subcategory.id)}
+                        >
+                            <Icon name='trash' />
+                        </Button>
+                        </TableCell>
+                    </TableRow>
+                ))
+            }
+            {
+                !isAddingSubcategory && subcategories.length === 0 && (
+                    <TableRow>
+                        <TableCell colSpan="2" className='text-center'>No sub-categories found for this category</TableCell>
+                    </TableRow>
+                )
+            }
           </TableBody>
 
           <TableFooter fullWidth>

@@ -33,7 +33,7 @@ export default function Categories(): React.JSX.Element {
   const axios = useAxios();
 
   React.useEffect(() => {
-    axios.get('/categories/')
+    axios.get('/categories/primary-categories')
       .then(({ data }) => {
         setCategories(data);
       })
@@ -178,7 +178,7 @@ export default function Categories(): React.JSX.Element {
                         autoFocus
                       />
                     ) :
-                    <NavLink to={ '/admin/categories/' + category.id }>{ category.name }</NavLink>
+                    <NavLink className='anchor' to={ '/admin/categories/' + category.id }>{ category.name }</NavLink>
                   }
                 </TableCell>
                 <TableCell style={{ width: '50px' }}>
