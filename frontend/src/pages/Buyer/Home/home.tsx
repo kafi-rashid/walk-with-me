@@ -1,21 +1,21 @@
 import * as React from 'react';
 import './home.scss';
-import bannerShoe from '../../assets/images/banner-shoe.png';
-import Shoe1 from '../../assets/images/dummy/shoe-1.png';
-import Shoe2 from '../../assets/images/dummy/shoe-2.png';
-import Shoe3 from '../../assets/images/dummy/shoe-3.png';
-import Shoe4 from '../../assets/images/dummy/shoe-4.png';
-import Shoe5 from '../../assets/images/dummy/shoe-5.png';
-import Shoe6 from '../../assets/images/dummy/shoe-6.png';
-import Shoe7 from '../../assets/images/dummy/shoe-7.png';
+import bannerShoe from '../../../assets/images/banner-shoe.png';
+import Shoe1 from '../../../assets/images/dummy/shoe-1.png';
+import Shoe2 from '../../../assets/images/dummy/shoe-2.png';
+import Shoe3 from '../../../assets/images/dummy/shoe-3.png';
+import Shoe4 from '../../../assets/images/dummy/shoe-4.png';
+import Shoe5 from '../../../assets/images/dummy/shoe-5.png';
+import Shoe6 from '../../../assets/images/dummy/shoe-6.png';
+import Shoe7 from '../../../assets/images/dummy/shoe-7.png';
 
-import Nike from '../../assets/images/brands/nike.png';
-import Puma from '../../assets/images/brands/puma.png';
-import Adidas from '../../assets/images/brands/adidas.png';
+import Nike from '../../../assets/images/brands/nike.png';
+import Puma from '../../../assets/images/brands/puma.png';
+import Adidas from '../../../assets/images/brands/adidas.png';
 import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../../store/UserContext';
+import { UserContext } from '../../../store/UserContext';
 
-import useAxios from '../../shared/axios';
+import useAxios from '../../../shared/axios';
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Home(): React.JSX.Element {
