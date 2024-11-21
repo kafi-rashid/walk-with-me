@@ -24,30 +24,20 @@ export default function Login(): React.JSX.Element {
                 email: email.trim(),
                 password: password.trim(),
             };
-            // const loggedInAs = {
-            //     isAuthenticated: true,
-            //     token: '1234',
-            //     user: {
-            //         firstName: 'Kafi',
-            //         lastName: 'Rashid',
-            //         id: 1,
-            //         role: ['Buyer']
-            //     }
-            // }
-
-            // setUser(loggedInAs);
-
-            // if (email === 'admin') {
-            //     navigate('/admin/');
-            // } else if (email === 'customer') {
-            //     navigate('/');
-            // } else {
-            //     navigate('/seller/')
-            // }
     
             axios.post(API_URL + '/authenticate/login', payload)
                 .then(({ data }) => {
-                    console.log(data);
+                    setUser(data);
+                    if (data?.roles?.length > 0) {
+                        const role = data.roles[0];
+                        if (role.toLowerCase() === 'admin') {
+                            navigate('/admin/');
+                        } else if (role.toLowerCase() === 'seller') {
+                            navigate('/seller/');
+                        } else {
+                            navigate('/')
+                        }
+                    } 
                 })
                 .catch((error) => {
                     console.log(error);
