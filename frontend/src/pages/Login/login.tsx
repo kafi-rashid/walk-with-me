@@ -3,7 +3,9 @@ import './login.scss';
 import { Button, Input } from 'semantic-ui-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../store/UserContext';
-import { useContext } from 'react';
+import { useContext, useEffect } from 'react';
+import axios from 'axios';
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login(): React.JSX.Element {
     const [email, setEmail] = React.useState<string>('');
@@ -12,50 +14,44 @@ export default function Login(): React.JSX.Element {
 
     const navigate = useNavigate();
 
+    useEffect(() => {
+        console.log(API_URL)
+    }, [])
+
     const login = () => {
         if (email.trim().length > 0 && password.trim().length > 0) {
             const payload = {
                 email: email.trim(),
                 password: password.trim(),
             };
-            console.log('Login Payload:', payload);
+            // const loggedInAs = {
+            //     isAuthenticated: true,
+            //     token: '1234',
+            //     user: {
+            //         firstName: 'Kafi',
+            //         lastName: 'Rashid',
+            //         id: 1,
+            //         role: ['Buyer']
+            //     }
+            // }
 
+            // setUser(loggedInAs);
 
-            const loggedInAs = {
-                isAuthenticated: true,
-                token: '1234',
-                user: {
-                    firstName: 'Kafi',
-                    lastName: 'Rashid',
-                    id: 1,
-                    role: ['Buyer']
-                }
-            }
-
-            setUser(loggedInAs);
-
-            if (email === 'admin') {
-                navigate('/admin/');
-            } else if (email === 'customer') {
-                navigate('/');
-            } else {
-                navigate('/seller/')
-            }
+            // if (email === 'admin') {
+            //     navigate('/admin/');
+            // } else if (email === 'customer') {
+            //     navigate('/');
+            // } else {
+            //     navigate('/seller/')
+            // }
     
-            // fetch('/api/login', {
-            //     method: 'POST',
-            //     headers: {
-            //         'Content-Type': 'application/json',
-            //     },
-            //     body: JSON.stringify(payload),
-            // })
-            // .then(response => response.json())
-            // .then(data => {
-            //     console.log('Login successful:', data);
-            // })
-            // .catch(error => {
-            //     console.error('Error during login:', error);
-            // });
+            axios.post(API_URL + '/authenticate/login', payload)
+                .then(({ data }) => {
+                    console.log(data);
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
         }
     };
 
