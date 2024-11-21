@@ -1,6 +1,6 @@
 import * as React from 'react';
 import './login.scss';
-import { Button, Input } from 'semantic-ui-react';
+import { Button, Input, Message } from 'semantic-ui-react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { UserContext } from '../../store/UserContext';
 import { useContext, useEffect } from 'react';
@@ -8,9 +8,11 @@ import axios from 'axios';
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Login(): React.JSX.Element {
+    const { user, setUser } = useContext(UserContext);
+
     const [email, setEmail] = React.useState<string>('');
     const [password, setPassword] = React.useState<string>('');
-    const { user, setUser } = useContext(UserContext);
+    const [showError, setShowError] = React.useState<boolean>(false);
 
     const navigate = useNavigate();
 
@@ -19,6 +21,8 @@ export default function Login(): React.JSX.Element {
     }, [])
 
     const login = () => {
+        setShowError(false);
+        
         if (email.trim().length > 0 && password.trim().length > 0) {
             const payload = {
                 email: email.trim(),
@@ -40,7 +44,7 @@ export default function Login(): React.JSX.Element {
                     } 
                 })
                 .catch((error) => {
-                    console.log(error);
+                    setShowError(true);
                 });
         }
     };
@@ -64,28 +68,35 @@ export default function Login(): React.JSX.Element {
                     <p className='logo'>Walk with Me</p>
                     <p className='title'>Log In to Continue</p>
                     <Input
-                        className='input-field'
+                        className='input-field mb-3'
                         type='text'
                         placeholder='Email address'
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                     />
                     <Input
-                        className='input-field'
+                        className='input-field mb-3'
                         type='password'
                         placeholder='Password'
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                     />
-                    <Button className='action-button' primary onClick={login}>
+                    <Button className='action-button mb-3' primary onClick={login}>
                         Log In
                     </Button>
+
+                    {
+                        showError &&
+                        <Message color='red'>Incorrect email address or password!</Message>
+                    }
+
+
                     <Button className='forgot-button'>Forgot Password?</Button>
 
                     <p className='sign-up-here'>
                         Or sign up <NavLink to={'/public/register'}>here</NavLink>
                     </p>
-                    <p className='disclaimer'>
+                    <p className='disclaimer' style={{ width: '300px' }}>
                         By logging in you agree to Walk with Me's Terms of Services and Privacy Policy
                     </p>
                 </div>

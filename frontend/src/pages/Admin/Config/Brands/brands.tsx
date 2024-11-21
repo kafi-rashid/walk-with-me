@@ -32,7 +32,7 @@ export default function Brands(): React.JSX.Element {
   const axios = useAxios();
 
   React.useEffect(() => {
-    axios.get('/brands/')
+    axios.get('/brands')
       .then(({ data }) => {
         setBrands(data);
       })

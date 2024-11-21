@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Divider,
   TableRow,
@@ -25,39 +26,11 @@ interface Product {
 }
 
 export default function Products(): React.JSX.Element {
-  const [products, setProducts] = React.useState<Product[]>([
-    {
-      id: 1,
-      name: 'Laptop Pro',
-      price: 1299.99,
-      brand: 'TechBrand',
-      category: 'Electronics',
-      subcategory: 'Laptops',
-      stockLeft: 25,
-    },
-    {
-      id: 2,
-      name: 'Smartphone X',
-      price: 999.99,
-      brand: 'PhoneCorp',
-      category: 'Electronics',
-      subcategory: 'Smartphones',
-      stockLeft: 40,
-    },
-    {
-      id: 3,
-      name: 'Gaming Headset',
-      price: 199.99,
-      brand: 'GamerGear',
-      category: 'Accessories',
-      subcategory: 'Headsets',
-      stockLeft: 50,
-    },
-  ]);
+  const [products, setProducts] = React.useState<Product[]>([]);
+  const navigate = useNavigate();
 
   const addProduct = () => {
-    // Placeholder for adding a new product
-    alert('Add Product functionality coming soon!');
+    navigate('/seller/products/add');
   };
 
   return (

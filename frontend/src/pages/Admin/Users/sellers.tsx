@@ -34,7 +34,7 @@ export default function Sellers(): React.JSX.Element {
   const axios = useAxios();
 
   React.useEffect(() => {
-    axios.get('/users/pending')
+    axios.get('/users/role/seller')
       .then(({ data }) => {
         setUsers(data);
       })
