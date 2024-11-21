@@ -17,5 +17,6 @@ public class ProductDTO {
     private Long parentCategoryId;
     private Long childCategoryId;
     private Long discountId;
+    private Long selleId;
     private List<ProductVariantDTO> variants;
 }

@@ -28,7 +28,7 @@ public class Product {
     @ManyToOne
     @JoinColumn(name = "seller_id", nullable = true)
     private UserEntity seller;
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String status;
 
     @ManyToOne

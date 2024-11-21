@@ -21,6 +21,8 @@ public class ProductServiceImpl implements ProductService {
     @Autowired
     private BrandRepository brandRepository;
     @Autowired
+    private UserRepository userRepository;
+    @Autowired
     private OrderItemRepository orderItemRepository;
 
     @Autowired
@@ -43,6 +45,11 @@ public class ProductServiceImpl implements ProductService {
                 Brand brand = brandRepository.findById(productDTO.getBrandId())
                         .orElseThrow(() -> new IllegalArgumentException("Brand not found with ID: " + productDTO.getBrandId()));
                 product.setBrand(brand);
+            }
+            if (productDTO.getSelleId() != null) {
+                UserEntity user = userRepository.findById(productDTO.getSelleId())
+                        .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + productDTO.getSelleId()));
+                product.setSeller(user);
             }
 
             // Set Parent Category
