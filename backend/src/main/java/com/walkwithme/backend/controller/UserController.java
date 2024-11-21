@@ -38,4 +38,9 @@ public class UserController {
     {
         return userService.reject(userIds);
     }
+
+    @GetMapping("/role/{role}")
+    public List<UserDto> getUsersByRole(@PathVariable String role) {
+        return userService.getUsersByRole(role);
+    }
 }

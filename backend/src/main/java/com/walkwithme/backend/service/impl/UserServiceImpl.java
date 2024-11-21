@@ -150,6 +150,14 @@ public class UserServiceImpl implements UserService {
         reviewRepository.deleteById(reviewId);
         return "Review deleted successfully";
     }
+
+    public List<UserDto> getUsersByRole(String role) {
+        return userRepository.findByRoleName(role.toLowerCase())
+                .stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
     private UserDto convertToDto(UserEntity user) {
         return modelMapper.map(user, UserDto.class);
     }

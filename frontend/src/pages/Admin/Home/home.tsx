@@ -21,7 +21,18 @@ export default function AdminHome(): React.JSX.Element {
                     <p className='m-0 p-0 logo mr-3'>Walk with Me</p>
                     <ul>
                         <li>
-                            <NavLink to='/admin/sellers'>Sellers</NavLink>
+                            Users
+                            <ul>
+                                <li onClick={ () => navigate('/admin/users/buyers') }>
+                                    All Buyers
+                                </li>
+                                <li onClick={ () => navigate('/admin/users/sellers') }>
+                                    All Sellers
+                                </li>
+                                <li>
+                                    <NavLink to='/admin/users/sellers/pending'>Pending Sellers</NavLink>
+                                </li>
+                            </ul>
                         </li>
                         <li>
                             <NavLink to='/admin/reviews'>Reviews</NavLink>
