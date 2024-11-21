@@ -18,5 +18,5 @@ public interface ProductService {
     void deleteProduct(Long id);
     ProductDetailDTO getProductDetailsForEdit(Long productId);
 
-     void updateStock(Long productId, int newQuantity);
+    void updateStock(Long productId, int newQuantity);
 }

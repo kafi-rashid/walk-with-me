@@ -15,5 +15,6 @@ public class ProductListDto {
         private CategoryDTO parentCategory;
         private CategoryDTO childCategory;
         private DiscountDTO discount;
+        private SellerDto seller;
         private List<ProductVariantDTO> variants;
 }
