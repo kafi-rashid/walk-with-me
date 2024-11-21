@@ -23,6 +23,11 @@ public class ProductController {
         ProductDTO createdProduct = productService.createProduct(productDTO);
         return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
     }
+    @GetMapping("create-or-edit/{id}")
+    public ResponseEntity<ProductDetailDTO> getProductDetailsForEdit(@PathVariable Long id) {
+        ProductDetailDTO product = productService.getProductDetailsForEdit(id);
+        return new ResponseEntity<>(product, HttpStatus.OK);
+    }
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
@@ -30,7 +35,7 @@ public class ProductController {
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/")
     public ResponseEntity<List<ProductDTO>> getAllProducts() {
         List<ProductDTO> products = productService.getAllProducts();
         return new ResponseEntity<>(products, HttpStatus.OK);

@@ -1,6 +1,7 @@
 package com.walkwithme.backend.repository;
 
 import com.walkwithme.backend.model.UserEntity;
+import com.walkwithme.backend.model.UserStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -15,7 +16,7 @@ import java.util.Optional;
 public interface UserRepository  extends JpaRepository<UserEntity, Long> {
     @Query("SELECT u FROM UserEntity u WHERE u.email = :email")
     Optional<UserEntity> findByEmail(@Param("email") String email);
-    @Query("SELECT u FROM UserEntity u JOIN u.roles r WHERE r.name = :roleName")
-    List<UserEntity> findAllByRoleName(@Param("roleName") String roleName);
+    @Query("SELECT u FROM UserEntity u WHERE u.status = :status")
+    List<UserEntity> findAllPendingUser(@Param("status") UserStatus status);
 
 }

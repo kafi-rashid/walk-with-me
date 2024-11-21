@@ -2,10 +2,7 @@ package com.walkwithme.backend.service.impl;
 
 import com.walkwithme.backend.dto.*;
 
-import com.walkwithme.backend.model.Brand;
-import com.walkwithme.backend.model.Category;
-import com.walkwithme.backend.model.Discount;
-import com.walkwithme.backend.model.Product;
+import com.walkwithme.backend.model.*;
 import com.walkwithme.backend.repository.ProductRepository;
 import com.walkwithme.backend.repository.BrandRepository;
 import com.walkwithme.backend.repository.CategoryRepository;
@@ -41,22 +38,45 @@ public class ProductServiceImpl implements ProductService {
             product.setPrice(productDTO.getPrice());
             product.setImage(productDTO.getImage());
 
+            // Set Brand
             if (productDTO.getBrandId() != null) {
                 Brand brand = brandRepository.findById(productDTO.getBrandId())
                         .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
                 product.setBrand(brand);
             }
 
+            // Set Subcategory
             if (productDTO.getChildCategoryId() != null) {
-                Category category = categoryRepository.findById(productDTO.getChildCategoryId())
-                        .orElseThrow(() -> new IllegalArgumentException("Category not found"));
-                product.setSubCategory(category);
+                Category subCategory = categoryRepository.findById(productDTO.getChildCategoryId())
+                        .orElseThrow(() -> new IllegalArgumentException("Sub-category not found"));
+                product.setSubCategory(subCategory);
             }
 
+            // Set Parent Category
+            if (productDTO.getParentCategoryId() != null) {
+                Category parentCategory = categoryRepository.findById(productDTO.getParentCategoryId())
+                        .orElseThrow(() -> new IllegalArgumentException("Parent category not found"));
+                product.setParentCategory(parentCategory);
+            }
+
+            // Set Discount
             if (productDTO.getDiscountId() != null) {
                 Discount discount = discountRepository.findById(productDTO.getDiscountId())
                         .orElseThrow(() -> new IllegalArgumentException("Discount not found"));
                 product.setDiscount(discount);
+            }
+
+            // Handle Variants
+            if (productDTO.getVariants() != null && !productDTO.getVariants().isEmpty()) {
+                List<ProductVariant> variants = productDTO.getVariants().stream().map(variantDTO -> {
+                    ProductVariant variant = new ProductVariant();
+                    variant.setSize(variantDTO.getSize());
+                    variant.setPrice(variantDTO.getPrice());
+                    variant.setStock(variantDTO.getStockQuantity());
+                    variant.setProduct(product); // Link the variant to the product
+                    return variant;
+                }).toList();
+                product.setVariants(variants); // Add variants to the product
             }
 
             Product savedProduct = productRepository.save(product);
@@ -65,6 +85,7 @@ public class ProductServiceImpl implements ProductService {
             throw new IllegalArgumentException("Error creating product: " + e.getMessage());
         }
     }
+
 
     @Override
     public ProductDTO getProductById(Long id) {
@@ -98,11 +119,13 @@ public class ProductServiceImpl implements ProductService {
             }
 
             if (productDTO.getParentCategoryId() != null) {
+                System.out.println("Parent category add"+productDTO.getParentCategoryId());
                 Category parentCategory = categoryRepository.findById(productDTO.getParentCategoryId())
                         .orElseThrow(() -> new IllegalArgumentException("Category not found"));
                 product.setParentCategory(parentCategory);
             }
             if (productDTO.getChildCategoryId() != null) {
+                System.out.println("Child category add"+productDTO.getChildCategoryId());
                 Category childCategory = categoryRepository.findById(productDTO.getChildCategoryId())
                         .orElseThrow(() -> new IllegalArgumentException("Category not found"));
                 product.setSubCategory(childCategory);
@@ -140,11 +163,11 @@ public class ProductServiceImpl implements ProductService {
                         .build())
                 .collect(Collectors.toList());
 
-        List<CategoryDTO> categories = categoryRepository.findAll().stream()
+        List<CategoryDTO> parentCategories = categoryRepository.findAll().stream()
+                .filter(category -> category.getParentId() == null)
                 .map(category -> CategoryDTO.builder()
                         .id(category.getId())
                         .name(category.getName())
-                        .parentId(category.getParent() != null ? category.getParent().getId() : null)
                         .build())
                 .collect(Collectors.toList());
 
@@ -160,6 +183,7 @@ public class ProductServiceImpl implements ProductService {
         if (productId != null) {
             Product existingProduct = productRepository.findById(productId)
                     .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+
             product = ProductDTO.builder()
                     .id(existingProduct.getId())
                     .name(existingProduct.getName())
@@ -169,24 +193,24 @@ public class ProductServiceImpl implements ProductService {
                     .brandId(existingProduct.getBrand() != null ? existingProduct.getBrand().getId() : null)
                     .parentCategoryId(existingProduct.getParentCategory() != null ? existingProduct.getParentCategory().getId() : null)
                     .discountId(existingProduct.getDiscount() != null ? existingProduct.getDiscount().getId() : null)
-                    .variants(existingProduct.getVariants().stream()
+                    .variants(existingProduct.getVariants() != null ? existingProduct.getVariants().stream()
                             .map(variant -> ProductVariantDTO.builder()
                                     .id(variant.getId())
                                     .size((variant.getSize() != null ? variant.getSize() : "") +
                                             (variant.getSize() != null ? " " + variant.getSize() : ""))
                                     .build())
-                            .collect(Collectors.toList()))
+                            .collect(Collectors.toList()) : null)
                     .build();
-
         }
 
         return ProductDetailDTO.builder()
                 .brands(brands)
-                .categories(categories)
+                .categories(parentCategories)
                 .discounts(discounts)
                 .variants(product != null ? product.getVariants() : null)
                 .build();
     }
+
     private ProductDTO mapToDTO(Product product) {
         return ProductDTO.builder()
                 .id(product.getId())

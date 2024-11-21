@@ -12,11 +12,7 @@ public class Category {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String name;
-
-    @OneToOne
-    @JoinColumn(name = "parent_id", nullable = true)
-    private Category parent;
+    private Long parentId;
 }
 

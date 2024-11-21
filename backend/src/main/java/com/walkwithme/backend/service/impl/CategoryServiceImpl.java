@@ -22,7 +22,7 @@ public class CategoryServiceImpl implements CategoryService {
             if (categoryDTO.getParentId() != null) {
                 Category parent = categoryRepository.findById(categoryDTO.getParentId())
                         .orElseThrow(() -> new IllegalArgumentException("Parent category not found"));
-                category.setParent(parent);
+                category.setParentId(categoryDTO.getParentId());
             }
 
             Category savedCategory = categoryRepository.save(category);
@@ -59,7 +59,7 @@ public class CategoryServiceImpl implements CategoryService {
             if (categoryDTO.getParentId() != null) {
                 Category parent = categoryRepository.findById(categoryDTO.getParentId())
                         .orElseThrow(() -> new IllegalArgumentException("Parent category not found"));
-                category.setParent(parent);
+                category.setParentId(categoryDTO.getParentId());
             }
 
             Category updatedCategory = categoryRepository.save(category);
@@ -84,7 +84,7 @@ public class CategoryServiceImpl implements CategoryService {
         return CategoryDTO.builder()
                 .id(category.getId())
                 .name(category.getName())
-                .parentId(category.getParent() != null ? category.getParent().getId() : null)
+                .parentId(category.getParentId() != null ? category.getParentId() : null)
                 .build();
     }
 }
