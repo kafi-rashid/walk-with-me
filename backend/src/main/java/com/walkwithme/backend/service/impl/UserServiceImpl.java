@@ -3,6 +3,7 @@ package com.walkwithme.backend.service.impl;
 import com.walkwithme.backend.dto.UserDto;
 import com.walkwithme.backend.model.UserEntity;
 import com.walkwithme.backend.model.UserStatus;
+import com.walkwithme.backend.repository.ReviewRepository;
 import com.walkwithme.backend.repository.UserRepository;
 import com.walkwithme.backend.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,8 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
     @Autowired
     private ModelMapper modelMapper;
     @Override
@@ -54,30 +57,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-public String approve(List<Long> userIds) {
-    List<UserEntity> approvedUsers = new ArrayList<>();
-    StringBuilder errorMessages = new StringBuilder();
+    public String approve(List<Long> userIds) {
+        List<UserEntity> approvedUsers = new ArrayList<>();
+        StringBuilder errorMessages = new StringBuilder();
 
-    for (Long userId : userIds) {
-        try {
-            UserEntity userEntity = userRepository.findById(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("User ID " + userId + " not found"));
+        for (Long userId : userIds) {
+            try {
+                UserEntity userEntity = userRepository.findById(userId)
+                        .orElseThrow(() -> new IllegalArgumentException("User ID " + userId + " not found"));
 
-            userEntity.setStatus(UserStatus.APPROVED);
-            approvedUsers.add(userEntity);
-        } catch (Exception e) {
-            errorMessages.append("Failed to approve User ID ").append(userId).append(": ").append(e.getMessage()).append("\n");
+                userEntity.setStatus(UserStatus.APPROVED);
+                approvedUsers.add(userEntity);
+            } catch (Exception e) {
+                errorMessages.append("Failed to approve User ID ").append(userId).append(": ").append(e.getMessage()).append("\n");
+            }
         }
-    }
 
-    if (!approvedUsers.isEmpty()) {
-        userRepository.saveAll(approvedUsers);
-    }
+        if (!approvedUsers.isEmpty()) {
+            userRepository.saveAll(approvedUsers);
+        }
 
-    return errorMessages.length() > 0
-            ? "Some approvals failed:\n" + errorMessages.toString()
-            : "All users approved successfully.";
-}
+        return errorMessages.length() > 0
+                ? "Some approvals failed:\n" + errorMessages.toString()
+                : "All users approved successfully.";
+    }
     @Override
     public String reject(List<Long> userIds) {
         List<UserEntity> approvedUsers = new ArrayList<>();
@@ -105,7 +108,37 @@ public String approve(List<Long> userIds) {
     }
 
 
+    public String approveSeller(Long sellerId) {
+        UserEntity seller = userRepository.findById(sellerId)
+                .orElseThrow(() -> new RuntimeException("Seller not found"));
 
+        if (!seller.getRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("Seller"))) {
+            throw new RuntimeException("User is not a seller");
+        }
+
+        seller.setStatus(UserStatus.APPROVED);
+        userRepository.save(seller);
+        return "Seller approved successfully";
+    }
+    public String rejectSeller(Long sellerId) {
+        UserEntity seller = userRepository.findById(sellerId)
+                .orElseThrow(() -> new RuntimeException("Seller not found"));
+
+        if (!seller.getRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("Seller"))) {
+            throw new RuntimeException("User is not a seller");
+        }
+
+        seller.setStatus(UserStatus.REJECTED);
+        userRepository.save(seller);
+        return "Seller rejected successfully";
+    }
+    public String deleteReview(Long reviewId) {
+        if (!reviewRepository.existsById(reviewId)) {
+            throw new RuntimeException("Review not found");
+        }
+        reviewRepository.deleteById(reviewId);
+        return "Review deleted successfully";
+    }
     private UserDto convertToDto(UserEntity user) {
         return modelMapper.map(user, UserDto.class);
     }
@@ -113,6 +146,5 @@ public String approve(List<Long> userIds) {
     private UserEntity convertToEntity(UserDto userDto) {
         return modelMapper.map(userDto, UserEntity.class);
     }
-
 
 }
