@@ -13,6 +13,7 @@ import {
   Divider,
   Form,
   TextArea,
+  Image,
 } from 'semantic-ui-react';
 import useAxios from '../../../shared/axios';
 import { UserContext } from '../../../store/UserContext';
@@ -125,7 +126,7 @@ export default function AddProduct(): React.JSX.Element {
         <Form.Field>
           <label>Image</label>
           <Input type="file" onChange={handleImageUpload} />
-          {image && <p>Image uploaded successfully</p>}
+          <Image className='mt-3' src={ image } size='small' />
         </Form.Field>
 
         <Form.Field>

@@ -22,17 +22,23 @@ export default function Home(): React.JSX.Element {
 
     const navigate = useNavigate();
     const { user, setUser } = React.useContext(UserContext);
-    const axiosInstance = useAxios();
+    const [products, setProducts] = React.useState([]);
+    const axios = useAxios();
 
     React.useEffect(() => {
-        axiosInstance.get(API_URL + '/users/')
+        getNewArrivals();
+    }, []);
+
+    const getNewArrivals = () => {
+        axios.get(API_URL + '/products')
             .then(({data}) => {
-                console.log(data);
+                console.log(data)
+                setProducts(data);
             })
             .catch((error) => {
                 console.log(error)
             });
-    }, []);
+    }
 
     return (
         <div className='container home'>
@@ -156,20 +162,24 @@ export default function Home(): React.JSX.Element {
                     </div>
                     <div className='content'>
                         <div className='new-arrival-items'>
-                            <div className='product-card' onClick={ () => navigate('/products/1') }>
-                                <div className='product-card-inner'>
-                                    <div>
-                                        <p className='title'>Air Max 90</p>
-                                        <p className='brand'>Nike</p>
-                                        <p className='price'>$150</p>
-                                        <p className="material-icons">
-                                            arrow_forward
-                                        </p>
+                            {
+                                products?.length > 0 &&
+                                products.map((product: any) => (
+                                    <div key={product?.id} className="product-card" onClick={() => navigate(`/products/${product?.id}`)}>
+                                    <div className="product-card-inner">
+                                        <div>
+                                        <p className="title">{product?.name}</p>
+                                        <p className="brand">{product?.brand?.name}</p>
+                                        <p className="price">{product?.price}</p>
+                                        <p className="material-icons">arrow_forward</p>
+                                        </div>
+                                        <img src={product?.image} alt={product?.name} />
                                     </div>
-                                    <img src={ Shoe1 }/>
-                                </div>
-                            </div>
-                            <div className='product-card' onClick={ () => navigate('/products/1') }>
+                                    </div>
+                                ))
+                            }
+
+                            {/* <div className='product-card' onClick={ () => navigate('/products/1') }>
                                 <div className='product-card-inner'>
                                     <div>
                                         <p className='title'>Air Max Dd</p>
@@ -246,7 +256,7 @@ export default function Home(): React.JSX.Element {
                                     </div>
                                     <img src={ Shoe7 }/>
                                 </div>
-                            </div>
+                            </div> */}
                         </div>
                     </div>
                 </div>

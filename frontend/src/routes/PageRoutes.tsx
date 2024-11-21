@@ -16,7 +16,6 @@ import Attributes from "../pages/Admin/Config/Attributes/attributes";
 import SubCategories from "../pages/Admin/Config/SubCategories/subcategories";
 import Buyers from "../pages/Admin/Users/buyers";
 import PendingSellers from "../pages/Admin/Users/pending-sellers";
-import AddProduct from "../pages/Seller/AddProduct/addproduct";
 import ProductDetails from "../pages/Seller/Product/product";
 
 export const AuthRoutes: React.FC = () => {
@@ -61,7 +60,7 @@ export const SellerRoutes: React.FC = () => {
             <Route path="/" element={<SellerHome />}>
                 <Route path="products" element={ <Products/> } />
                 <Route path="products/:id" element={ <ProductDetails/> } />
-                <Route path="products/add" element={ <AddProduct/> } />
+                <Route path="products/add" element={ <ProductDetails/> } />
                 <Route path="orders" element={ <Orders/> } />
             </Route>
         </Routes>

@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
   Button,
   Input,
@@ -14,8 +14,10 @@ import {
   Divider,
   Form,
   TextArea,
+  Image,
 } from 'semantic-ui-react';
 import useAxios from '../../../shared/axios';
+import { UserContext } from '../../../store/UserContext';
 
 export default function ProductDetails(): React.JSX.Element {
   const { id: productId } = useParams<{ id: string }>(); // Get `id` from URL params
@@ -31,6 +33,9 @@ export default function ProductDetails(): React.JSX.Element {
   const [brands, setBrands] = React.useState([]);
   const [categories, setCategories] = React.useState([]);
   const [subcategories, setSubcategories] = React.useState([]);
+
+  const { user } = React.useContext(UserContext);
+  const navigate = useNavigate();
 
   const axios = useAxios();
 
@@ -116,22 +121,23 @@ export default function ProductDetails(): React.JSX.Element {
       parentCategoryId,
       childCategoryId,
       variants,
+      sellerId: user?.user?.userId ?? null
     };
 
     if (productId) {
-      // Update existing product
       axios.put(`/products/${productId}`, payload)
         .then(({ data }) => {
-          console.log('Product updated:', data);
+          alert("Product has been updated!");
+          navigate('/seller/products');
         })
         .catch((error) => {
           console.log('Error updating product:', error);
         });
     } else {
-      // Add new product
       axios.post('/products', payload)
         .then(({ data }) => {
-          console.log('Product created:', data);
+          alert("Product has been added!");
+          navigate('/seller/products');
         })
         .catch((error) => {
           console.log('Error adding product:', error);
@@ -167,7 +173,9 @@ export default function ProductDetails(): React.JSX.Element {
         <Form.Field>
           <label>Image</label>
           <Input type="file" onChange={handleImageUpload} />
-          {image && <p>Image uploaded successfully</p>}
+          {/* {image && <p>Image uploaded successfully</p>} */}
+          <Image className='mt-3' src={ image } size='small' />
+
         </Form.Field>
 
         <Form.Field>

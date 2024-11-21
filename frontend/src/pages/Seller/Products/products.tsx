@@ -41,7 +41,6 @@ export default function Products(): React.JSX.Element {
     axios.get('/products')
       .then(({ data }) => {
         setProducts(data);
-        console.log(data)
       })
       .catch((error) => {
         console.log("Error", error);
@@ -80,20 +79,20 @@ export default function Products(): React.JSX.Element {
 
           <TableBody>
             {products.map(product => (
-              <TableRow key={product.id}>
-                <TableCell>{product.id}</TableCell>
+              <TableRow key={product?.id}>
+                <TableCell>{product?.id}</TableCell>
                 <TableCell>
                   <img className='product-list-image' src={product.image} alt="Product" />
                 </TableCell>
                 <TableCell>
                   <NavLink className="anchor" to={ '/seller/products/' + product.id }>
-                    {product.name}
+                    {product?.name}
                   </NavLink>
                 </TableCell>
-                <TableCell>${product.price.toFixed(2)}</TableCell>
-                <TableCell>{product.brand.name}</TableCell>
-                <TableCell>{product.parentCategory.name}</TableCell>
-                <TableCell>{product.childCategory.name}</TableCell>
+                <TableCell>${product?.price?.toFixed(2)}</TableCell>
+                <TableCell>{product?.brand?.name}</TableCell>
+                <TableCell>{product?.parentCategory?.name}</TableCell>
+                <TableCell>{product?.childCategory?.name}</TableCell>
               </TableRow>
             ))}
           </TableBody>
