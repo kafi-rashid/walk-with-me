@@ -27,14 +27,14 @@ interface User {
   billingAddress: { street: string, city: string, state: string, country: string };
 }
 
-export default function Sellers(): React.JSX.Element {
+export default function Buyers(): React.JSX.Element {
   const [users, setUsers] = React.useState<User[]>([]);
   const [selectedUsers, setSelectedUsers] = React.useState<number[]>([]); // State to track selected users
   const [confirmApproveId, setConfirmApproveId] = React.useState<number | null>(null); // State for confirmation
   const axios = useAxios();
 
   React.useEffect(() => {
-    axios.get('/users/')
+    axios.get('/users/pending')
       .then(({ data }) => {
         setUsers(data);
       })
@@ -126,7 +126,7 @@ export default function Sellers(): React.JSX.Element {
   return (
     <div className='manage-page'>
       <div className="d-flex justify-content-between">
-        <p className='page-title'>Users</p>
+        <p className='page-title'>List of Buyers</p>
       </div>
 
       <Divider />

@@ -133,7 +133,7 @@ export default function Categories(): React.JSX.Element {
           <TableHeader>
             <TableRow>
               <TableHeaderCell style={{ width: '50px' }}>ID</TableHeaderCell>
-              <TableHeaderCell colSpan={ 2 } className='d-flex align-items-center justify-content-between' style={{ width: 'calc(100% + 62px)' }}> 
+              <TableHeaderCell colSpan={ 2 } className='d-flex align-items-center justify-content-between' style={{ width: categories.length > 0 ? 'calc(100% + 62px)' : '' }}> 
                 Name
                 <Button
                   icon
