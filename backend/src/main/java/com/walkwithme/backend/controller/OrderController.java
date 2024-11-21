@@ -51,4 +51,21 @@ public class OrderController {
         orderService.changeOrderStatus(id, OrderStatus.valueOf(status.toUpperCase()));
         return ResponseEntity.noContent().build();
     }
+
+
+    @PutMapping("/{orderId}/cancel")
+    public ResponseEntity<String> cancelOrder(@PathVariable Long orderId, @RequestParam Long sellerId) {
+        orderService.cancelOrder(orderId, sellerId);
+        return ResponseEntity.ok("Order canceled successfully");
+    }
+
+    // Endpoint to update the order status
+    /*@PutMapping("/{orderId}/status")
+    public ResponseEntity<String> updateOrderStatus(
+            @PathVariable Long orderId,
+            @RequestParam Long sellerId,
+            @RequestParam OrderStatus newStatus) {
+        orderService.updateOrderStatus(orderId, sellerId, newStatus);
+        return ResponseEntity.ok("Order status updated successfully");
+    }*/
 }

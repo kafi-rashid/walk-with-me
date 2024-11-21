@@ -12,4 +12,8 @@ public interface OrderService {
     OrderDTO updateOrder(Long id, OrderDTO orderDTO);
     void deleteOrder(Long id);
     void changeOrderStatus(Long id, OrderStatus status);
+    void cancelOrder(Long orderId, Long sellerId);
+/*
+    void updateOrderStatus(Long orderId, Long sellerId, OrderStatus newStatus);
+*/
 }
