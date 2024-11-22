@@ -1,9 +1,7 @@
 package com.walkwithme.backend.controller;
 
-import com.walkwithme.backend.dto.BrandDTO;
-import com.walkwithme.backend.dto.ProductDTO;
-import com.walkwithme.backend.dto.ProductDetailDTO;
-import com.walkwithme.backend.dto.ProductListDto;
+import com.walkwithme.backend.dto.*;
+import com.walkwithme.backend.model.Review;
 import com.walkwithme.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,8 +29,8 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
-        ProductDTO product = productService.getProductById(id);
+    public ResponseEntity<ProductListDto> getProductById(@PathVariable Long id) {
+        ProductListDto product = productService.getProductById(id);
         return new ResponseEntity<>(product, HttpStatus.OK);
     }
 
@@ -62,5 +60,26 @@ public class ProductController {
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @PutMapping("/add-review/{productId}")
+    public ResponseEntity<ProductDTO> addProductReview(@PathVariable Long productId, @RequestBody ReviewDto reviewDto) {
+        ProductDTO createdProduct = productService.addProductReview(productId, reviewDto);
+        return new ResponseEntity<>(createdProduct, HttpStatus.CREATED);
+    }
+    @GetMapping("/top-slling")
+    public ResponseEntity<List<ProductListDto>> getTopSellingProducts() {
+        List<ProductListDto> products = productService.getTopSellingProducts();
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+    @GetMapping("/new-arrival")
+    public ResponseEntity<List<ProductListDto>> getNewArrivalProducts() {
+        List<ProductListDto> products = productService.getNewArrivalProducts();
+        return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+    @GetMapping("/filter")
+    public ResponseEntity<List<ProductListDto>> filterProducts(@RequestParam Long brandId) {
+        List<ProductListDto> products = productService.filterProducts(brandId);
+        return new ResponseEntity<>(products, HttpStatus.OK);
     }
 }

@@ -6,6 +6,8 @@ import com.walkwithme.backend.model.*;
 import com.walkwithme.backend.repository.*;
 import com.walkwithme.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -32,6 +34,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private DiscountRepository discountRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
@@ -101,12 +105,69 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
+    public ProductDTO addProductReview(Long productId, ReviewDto reviewDto) {
+        try {
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
+
+            Review review = new Review();
+            review.setComment(reviewDto.getComment());
+            review.setRating(reviewDto.getRating());
+            review.setReviewDate(reviewDto.getReviewDate());
+            review.setProduct(product);
+
+            if (reviewDto.getBuyerId() != null && reviewDto.getBuyerId() > 0) {
+                UserEntity buyer = userRepository.findById(reviewDto.getBuyerId())
+                        .orElseThrow(() -> new IllegalArgumentException("Buyer not found with id: " + reviewDto.getBuyerId()));
+                review.setBuyer(buyer);
+            }
+
+            reviewRepository.save(review);
+            product.getReviews().add(review);
+
+            Product updatedProduct = productRepository.save(product);
+
+            return mapToDTO(updatedProduct);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error adding review: " + e.getMessage(), e);
+        }
+    }
 
 
     @Override
-    public ProductDTO getProductById(Long id) {
+    public List<ProductListDto> getTopSellingProducts() {
+        return productRepository.findAll(PageRequest.of(0, 6, Sort.by(Sort.Direction.ASC, "id")))
+                .stream()
+                .map(this::mapToListDTO)
+                .toList();
+    }
+
+    @Override
+    public List<ProductListDto> getNewArrivalProducts() {
+        return productRepository.findAll(PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "id")))
+                .stream()
+                .map(this::mapToListDTO)
+                .toList();
+    }
+
+    @Override
+    public List<ProductListDto> filterProducts(Long brandId) {
+//        return productRepository.findByBrandId(brandId)
+//                .stream()
+//                .map(this::mapToListDTO)
+//                .toList();
+        return productRepository.findAll()
+                .stream()
+                .filter(product -> product.getBrand().getId().equals(brandId))
+                .map(this::mapToListDTO)
+                .toList();
+    }
+
+    @Override
+    public ProductListDto getProductById(Long id) {
         return productRepository.findById(id)
-                .map(this::mapToDTO)
+                .map(this::mapToListDTO)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
     }
 
@@ -366,7 +427,7 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                                 .map(this::mapVariantToDTO)
                                 .collect(Collectors.toList()) :
                         Collections.emptyList())
-                .seller(product.getSeller()!=null ? mapSallerToDTO(product.getSeller()) : null)
+                .seller(product.getSeller()!=null ? mapSallerBuyerToDTO(product.getSeller()) : null)
                 .build();
     }
 
@@ -376,9 +437,9 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                 .name(brand.getName())
                 .build();
     }
-    private SellerDto mapSallerToDTO(UserEntity user) {
-        return SellerDto.builder()
-                .sellerId(user.getId())
+    private SellerBuyerDto mapSallerBuyerToDTO(UserEntity user) {
+        return SellerBuyerDto.builder()
+                .id(user.getId())
                 .fristName(user.getFirstName())
                 .lastName(user.getLastName())
                 .build();
@@ -405,5 +466,17 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                 .stockQuantity(variant.getStock())
                 .build();
     }
+    private ReviewDto mapReviewToDTO(Review review) {
+        return ReviewDto.builder()
+                .id(review.getId())
+                .comment(review.getComment())
+                .rating(review.getRating())
+                .reviewDate(review.getReviewDate())
+                .productId(review.getProduct() != null ? review.getProduct().getId() : null)
+                .buyerId(review.getBuyer() != null ? review.getBuyer().getId() : null)
+                .buyer(review.getBuyer() != null ? mapSallerBuyerToDTO(review.getBuyer()) : null)
+                .build();
+    }
+
 
 }
