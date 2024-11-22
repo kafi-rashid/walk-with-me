@@ -11,6 +11,7 @@ import java.util.List;
 @Getter
 @Setter
 public class Order {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -18,6 +19,7 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
+
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items;
 
@@ -28,6 +30,11 @@ public class Order {
     @Column(nullable = false)
     private Double totalAmount;
 
-    private String shippingAddress;
-    private String billingAddress;
+    @ManyToOne
+    @JoinColumn(name = "shipping_address_id", nullable = true)
+    private Address shippingAddress;
+
+    @ManyToOne
+    @JoinColumn(name = "billing_address_id", nullable = true)
+    private Address billingAddress;
 }

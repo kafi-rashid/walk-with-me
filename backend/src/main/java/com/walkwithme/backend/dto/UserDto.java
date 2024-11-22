@@ -1,6 +1,7 @@
 package com.walkwithme.backend.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.walkwithme.backend.model.UserStatus;
 import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +19,7 @@ public class UserDto {
     private String lastName;
     private String phoneNumber;
     private Boolean isActive;
-    private String status;
+    private UserStatus status;
     private AddressDto shippingAddress;
     private AddressDto billingAddress;
     private List<RoleDto> roles;
