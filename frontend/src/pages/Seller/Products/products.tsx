@@ -15,6 +15,8 @@ import {
   MenuItem
 } from 'semantic-ui-react';
 import useAxios from '../../../shared/axios';
+import { UserContext } from '../../../store/UserContext';
+import { useContext, useEffect } from 'react';
 
 interface Product {
   id: number;
@@ -29,12 +31,11 @@ interface Product {
 
 export default function Products(): React.JSX.Element {
   const [products, setProducts] = React.useState<Product[]>([]);
+  const [userObj, setUserObj] = React.useState('');
+  const [userProfile, setUserProfile] = React.useState<any>({});
   const navigate = useNavigate();
-
-  const addProduct = () => {
-    navigate('/seller/products/add');
-  };
-
+  const { user, setUser } = useContext(UserContext);
+  const [canAddProduct, setCanAddProduct] = React.useState(false);
   const axios = useAxios();
 
   React.useEffect(() => {
@@ -45,13 +46,44 @@ export default function Products(): React.JSX.Element {
       .catch((error) => {
         console.log("Error", error);
       });
+
+      const user = localStorage.getItem('user');
+    if (user) {
+      setUserObj(JSON.parse(user));
+    }
   }, []);
+
+  React.useEffect(() => {
+    if (userObj) {
+      getUserDetails();
+    }
+  }, [userObj]);
+
+  const getUserDetails = () => {
+    axios.get('/users/' + userObj?.userId)
+      .then(({ data }) => {
+        setUserProfile(data);
+        if (data?.status) {
+          if (data.status !== 'PENDING') {
+            setCanAddProduct(true)
+          }
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      })
+  };
+
+  const addProduct = () => {
+    navigate('/seller/products/add');
+  };
   
   return (
     <div className='manage-page'>
       <div className='d-flex justify-content-between'>
         <p className='page-title'>Product List</p>
         <Button
+          disabled={ !canAddProduct }
           icon
           labelPosition='left'
           primary

@@ -91,7 +91,6 @@ export default function Login(): React.JSX.Element {
                         <Message color='red'>Incorrect email address or password!</Message>
                     }
 
-
                     <Button className='forgot-button'>Forgot Password?</Button>
 
                     <p className='sign-up-here'>

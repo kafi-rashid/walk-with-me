@@ -73,6 +73,7 @@ export default function Register(): React.JSX.Element {
                 axios.post('/authenticate/login', loginPayload)
                     .then(({ data }) => {
                         setUser(data);
+                        localStorage.setItem("user", JSON.stringify(data));
                         if (data?.roles?.length > 0) {
                             const role = data.roles[0];
                             if (role.toLowerCase() === 'admin') {
