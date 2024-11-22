@@ -1,4 +1,4 @@
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useEffect } from 'react';
 
 export const UserContext = createContext();
 
@@ -7,6 +7,16 @@ export const UserProvider = ({ children }) => {
         user: null,
         isAuthenticated: false,
     });
+
+    useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            setUser({
+                user: JSON.parse(storedUser),
+                isAuthenticated: true,
+            });
+        }
+    }, []);
 
     return (
         <UserContext.Provider value={{ user, setUser }}>

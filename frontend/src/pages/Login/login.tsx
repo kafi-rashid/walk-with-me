@@ -32,6 +32,7 @@ export default function Login(): React.JSX.Element {
             axios.post(API_URL + '/authenticate/login', payload)
                 .then(({ data }) => {
                     setUser(data);
+                    localStorage.setItem("user", JSON.stringify(data));
                     if (data?.roles?.length > 0) {
                         const role = data.roles[0];
                         if (role.toLowerCase() === 'admin') {

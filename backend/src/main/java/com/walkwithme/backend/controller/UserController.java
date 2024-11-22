@@ -23,6 +23,13 @@ public class UserController {
     {
         return userService.findAllPendingUser();
     }
+
+    @GetMapping("/{id}")
+    public UserDto findById(@PathVariable Long id)
+    {
+        return userService.findById(id);
+    }
+
     @DeleteMapping("/{id}")
     public String deleteById(@PathVariable Long id)
     {
