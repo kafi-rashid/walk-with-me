@@ -32,7 +32,10 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO createOrder(OrderDTO orderDTO) {
         UserEntity user = userRepository.findById(orderDTO.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + orderDTO.getUserId()));
-
+if(user.getRoles().contains("seller"))
+{
+    throw new IllegalArgumentException("You cannot order a product as seller");
+}
         Order order = new Order();
         order.setUser(user);
         order.setStatus(OrderStatus.PENDING);

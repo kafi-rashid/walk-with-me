@@ -77,11 +77,13 @@ public class UserServiceImpl implements UserService {
         modelMapper.map(userDto, user);
 
         if (userDto.getShippingAddress() != null) {
+            System.out.println(userDto.getShippingAddress().getPostalCode()+"Prianka post");
             Address shippingAddress = modelMapper.map(userDto.getShippingAddress(), Address.class);
             user.setShippingAddress(shippingAddress);
         }
 
         if (userDto.getBillingAddress() != null) {
+            System.out.println(userDto.getShippingAddress().getPostalCode()+"Prianka post");
             Address billingAddress = modelMapper.map(userDto.getBillingAddress(), Address.class);
             user.setBillingAddress(billingAddress);
         }
