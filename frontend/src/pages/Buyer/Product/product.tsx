@@ -1,7 +1,14 @@
 import * as React from 'react';
 import { useParams } from 'react-router-dom';
 import './product.scss';
-import { Select } from 'semantic-ui-react';
+import {
+    Select,
+    TableRow,
+    TableCell,
+    TableBody,
+    Loader,
+    Table,
+} from 'semantic-ui-react'
 import useAxios from '../../../shared/axios';
 
 export default function Product(): React.JSX.Element {
@@ -60,7 +67,11 @@ export default function Product(): React.JSX.Element {
   };
 
   if (loading) {
-    return <p>Loading...</p>;
+    return (
+        <div className='loader-fullpage'>
+            <Loader active inline='centered'/>
+        </div>
+    );
   }
 
   if (!product) {
@@ -75,17 +86,44 @@ export default function Product(): React.JSX.Element {
             <img src={product.image || ''} alt={product.name} />
           </div>
           <div className="content">
-            <p className="title">{product.name}</p>
-            <p className="category">{category?.name || "Uncategorized"}</p>
-            <p className="brand">{brand?.name || "Brand not available"}</p>
-            <p className="seller">Seller: {seller?.name || "Seller not available"}</p>
-            <p className="price">${product.price}</p>
-            <p className="description">{product.description}</p>
-            <div className="sizes d-flex vertical-center mr-3">
+            <p className="title m-0">{product.name}</p>
+            <p className="category ">{category?.name || "Uncategorized"}</p>
+            <p className="price m-0 mb-4">${product.price}</p>
+
+            <Table basic='very' celled collapsing>
+                <TableBody>
+                    <TableRow>
+                        <TableCell>
+                            Brand
+                        </TableCell>
+                        <TableCell>
+                            { brand?.name || "N/A" }
+                        </TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>
+                            Sold by
+                        </TableCell>
+                        <TableCell>
+                            { (seller?.firstName + ' ' + seller?.lastName) || "N/A" }
+                        </TableCell>
+                    </TableRow>
+                    <TableRow>
+                        <TableCell>
+                            Description
+                        </TableCell>
+                        <TableCell>
+                            { product.description }
+                        </TableCell>
+                    </TableRow>
+                </TableBody>
+            </Table>
+
+            <div className="sizes d-flex vertical-center pt-4 mr-3 mb-4">
               <p className="label">Size:</p>
               <Select className="size" placeholder="Select" options={sizes} />
             </div>
-            <div className="actions">
+            <div className="actions pt-4">
               <button>Add to Cart</button>
             </div>
           </div>

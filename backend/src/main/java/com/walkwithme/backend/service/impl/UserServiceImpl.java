@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -54,6 +55,16 @@ public class UserServiceImpl implements UserService {
                 .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public UserDto findById(Long id) {
+        Optional<UserEntity> userOptional = userRepository.findById(id);
+        if (userOptional.isPresent()) {
+            return convertToDto(userOptional.get());
+        } else {
+            throw new IllegalArgumentException("User ID " + id + " not found");
+        }
     }
 
     @Override
