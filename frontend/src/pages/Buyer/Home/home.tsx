@@ -23,7 +23,7 @@ export default function Home(): React.JSX.Element {
     const getNewArrivals = () => {
         axios.get(API_URL + '/products/new-arrival')
             .then(({data}) => {
-                console.log(data)
+                // console.log(data)
                 setNewArrivals(data);
             })
             .catch((error) => {
@@ -34,7 +34,7 @@ export default function Home(): React.JSX.Element {
     const getTopSelling = () => {
         axios.get(API_URL + '/products/top-slling')
             .then(({data}) => {
-                console.log(data)
+                // console.log(data)
                 setTopSelling(data);
             })
             .catch((error) => {

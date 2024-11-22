@@ -112,6 +112,43 @@ export default function Cart(): React.JSX.Element {
         );
     };
 
+    const handleCheckout = () => {
+        const items = products.map((item) => {
+            const variant = item.product.variants.find(
+                (variant: any) => variant.id === item.variant
+            );
+            const price = variant?.price || 0;
+    
+            return {
+                productId: item.product.id,
+                productName: item.product.name,
+                quantity: item.quantity,
+                price: price,
+                variantId: item.variant,
+            };
+        });
+    
+        const payload = {
+            userId: userObj?.userId,
+            items: items,
+            totalAmount: calculateGrandTotal(),
+            shippingAddressId: userProfile?.shippingAddress?.id || null,
+            billingAddressId: userProfile?.billingAddress?.id || null,
+        };
+    
+        console.log("Checkout Payload:", payload);
+    
+        // Call an API or process the payload as needed
+        // axios.post('/checkout', payload)
+        //     .then((response) => {
+        //         console.log("Checkout successful:", response.data);
+        //     })
+        //     .catch((error) => {
+        //         console.error("Checkout error:", error);
+        //     });
+    };
+    
+
     return (
         <div className="page product">
             <div className="page-inner">
@@ -214,23 +251,23 @@ export default function Cart(): React.JSX.Element {
                             <div>
                                 <table>
                                     <tr>
-                                        <td>Street Address</td>
+                                        <td className='pr-4'>Street Address</td>
                                         <td>: { shippingAddress.street }</td>
                                     </tr>
                                     <tr>
-                                        <td>City</td>
+                                        <td className='pr-4'>City</td>
                                         <td>: { shippingAddress.city }</td>
                                     </tr>
                                     <tr>
-                                        <td>State</td>
+                                        <td className='pr-4'>State</td>
                                         <td>: { shippingAddress.state }</td>
                                     </tr>
                                     <tr>
-                                        <td>Zip</td>
+                                        <td className='pr-4'>Zip</td>
                                         <td>: { shippingAddress.postalCode }</td>
                                     </tr>
                                     <tr>
-                                        <td>Country</td>
+                                        <td className='pr-4'>Country</td>
                                         <td>: { shippingAddress.country }</td>
                                     </tr>
                                 </table>
@@ -244,23 +281,23 @@ export default function Cart(): React.JSX.Element {
                             <div>
                                 <table>
                                     <tr>
-                                        <td>Street Address</td>
+                                        <td className='pr-4'>Street Address</td>
                                         <td>: { billingAddress.street }</td>
                                     </tr>
                                     <tr>
-                                        <td>City</td>
+                                        <td className='pr-4'>City</td>
                                         <td>: { billingAddress.city }</td>
                                     </tr>
                                     <tr>
-                                        <td>State</td>
+                                        <td className='pr-4'>State</td>
                                         <td>: { billingAddress.state }</td>
                                     </tr>
                                     <tr>
-                                        <td>Zip</td>
+                                        <td className='pr-4'>Zip</td>
                                         <td>: { billingAddress.postalCode }</td>
                                     </tr>
                                     <tr>
-                                        <td>Country</td>
+                                        <td className='pr-4'>Country</td>
                                         <td>: { billingAddress.country }</td>
                                     </tr>
                                 </table>
@@ -270,10 +307,10 @@ export default function Cart(): React.JSX.Element {
 
                     <div>
                         <Divider/>
-                        <Button primary
-                            floated='right'>
+                        <Button primary floated="right" onClick={handleCheckout}>
                             Check Out
                         </Button>
+
                     </div>
 
                 </div>
