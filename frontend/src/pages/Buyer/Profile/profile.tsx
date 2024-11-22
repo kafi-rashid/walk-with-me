@@ -11,14 +11,14 @@ export default function Profile(): React.JSX.Element {
         street: '',
         city: '',
         state: '',
-        zipCode: '',
+        postalCode: '',
         country: ''
     });
     const [billingAddress, setBillingAddress] = React.useState({
         street: '',
         city: '',
         state: '',
-        zipCode: '',
+        postalCode: '',
         country: ''
     });
     const [loading, setLoading] = React.useState(false);
@@ -124,9 +124,9 @@ export default function Profile(): React.JSX.Element {
                         <div className="d-flex flex-1">
                             <Input
                                 className="mb-3 flex-1 mr-2"
-                                name="zipCode"
+                                name="postalCode"
                                 placeholder="Zip Code"
-                                value={shippingAddress.zipCode}
+                                value={shippingAddress.postalCode}
                                 onChange={(e) => handleInputChange(e, 'shipping')}
                             />
                             <Input
@@ -167,9 +167,9 @@ export default function Profile(): React.JSX.Element {
                         <div className="d-flex flex-1">
                             <Input
                                 className="mb-3 flex-1 mr-2"
-                                name="zipCode"
+                                name="postalCode"
                                 placeholder="Zip Code"
-                                value={billingAddress.zipCode}
+                                value={billingAddress.postalCode}
                                 onChange={(e) => handleInputChange(e, 'billing')}
                             />
                             <Input

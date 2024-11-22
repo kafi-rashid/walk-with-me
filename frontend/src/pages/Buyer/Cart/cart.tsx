@@ -24,14 +24,14 @@ export default function Cart(): React.JSX.Element {
         street: '',
         city: '',
         state: '',
-        zipCode: '',
+        postalCode: '',
         country: ''
     });
     const [billingAddress, setBillingAddress] = React.useState({
         street: '',
         city: '',
         state: '',
-        zipCode: '',
+        postalCode: '',
         country: ''
     });
 
@@ -72,6 +72,8 @@ export default function Cart(): React.JSX.Element {
     const updateCartInLocalStorage = (updatedCart: any[]) => {
         localStorage.setItem('cart', JSON.stringify(updatedCart));
         setProducts(updatedCart);
+        const event = new Event('cartUpdate');
+        window.dispatchEvent(event);
     };
 
     const incrementQuantity = (variantId: number) => {
@@ -109,6 +111,47 @@ export default function Cart(): React.JSX.Element {
             0
         );
     };
+
+    const handleCheckout = () => {
+        const items = products.map((item) => {
+            const variant = item.product.variants.find(
+                (variant: any) => variant.id === item.variant
+            );
+            const price = variant?.price || 0;
+    
+            return {
+                productId: item.product.id,
+                productName: item.product.name,
+                quantity: item.quantity,
+                price: price,
+                variantId: item.variant,
+            };
+        });
+    
+        const payload = {
+            userId: userObj?.userId,
+            items: items,
+            totalAmount: calculateGrandTotal(),
+            shippingAddressId: userProfile?.shippingAddress?.id || null,
+            billingAddressId: userProfile?.billingAddress?.id || null,
+        };
+
+        if (!payload.shippingAddressId || !payload.shippingAddressId) {
+            alert('Please go to profile and both add billing and shipping addresses')
+            return;
+        }
+    
+        console.log("Checkout Payload:", payload);
+    
+        // axios.post('/orders', payload)
+        //     .then((response) => {
+        //         console.log("Checkout successful:", response.data);
+        //     })
+        //     .catch((error) => {
+        //         console.error("Checkout error:", error);
+        //     });
+    };
+    
 
     return (
         <div className="page product">
@@ -212,23 +255,23 @@ export default function Cart(): React.JSX.Element {
                             <div>
                                 <table>
                                     <tr>
-                                        <td>Street Address</td>
+                                        <td className='pr-4'>Street Address</td>
                                         <td>: { shippingAddress.street }</td>
                                     </tr>
                                     <tr>
-                                        <td>City</td>
+                                        <td className='pr-4'>City</td>
                                         <td>: { shippingAddress.city }</td>
                                     </tr>
                                     <tr>
-                                        <td>State</td>
+                                        <td className='pr-4'>State</td>
                                         <td>: { shippingAddress.state }</td>
                                     </tr>
                                     <tr>
-                                        <td>Zip</td>
-                                        <td>: { shippingAddress.zipCode }</td>
+                                        <td className='pr-4'>Zip</td>
+                                        <td>: { shippingAddress.postalCode }</td>
                                     </tr>
                                     <tr>
-                                        <td>Country</td>
+                                        <td className='pr-4'>Country</td>
                                         <td>: { shippingAddress.country }</td>
                                     </tr>
                                 </table>
@@ -242,23 +285,23 @@ export default function Cart(): React.JSX.Element {
                             <div>
                                 <table>
                                     <tr>
-                                        <td>Street Address</td>
+                                        <td className='pr-4'>Street Address</td>
                                         <td>: { billingAddress.street }</td>
                                     </tr>
                                     <tr>
-                                        <td>City</td>
+                                        <td className='pr-4'>City</td>
                                         <td>: { billingAddress.city }</td>
                                     </tr>
                                     <tr>
-                                        <td>State</td>
+                                        <td className='pr-4'>State</td>
                                         <td>: { billingAddress.state }</td>
                                     </tr>
                                     <tr>
-                                        <td>Zip</td>
-                                        <td>: { billingAddress.zipCode }</td>
+                                        <td className='pr-4'>Zip</td>
+                                        <td>: { billingAddress.postalCode }</td>
                                     </tr>
                                     <tr>
-                                        <td>Country</td>
+                                        <td className='pr-4'>Country</td>
                                         <td>: { billingAddress.country }</td>
                                     </tr>
                                 </table>
@@ -268,10 +311,10 @@ export default function Cart(): React.JSX.Element {
 
                     <div>
                         <Divider/>
-                        <Button primary
-                            floated='right'>
+                        <Button primary floated="right" onClick={handleCheckout}>
                             Check Out
                         </Button>
+
                     </div>
 
                 </div>

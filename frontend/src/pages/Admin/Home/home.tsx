@@ -46,9 +46,6 @@ export default function AdminHome(): React.JSX.Element {
                                 <li onClick={ () => navigate('/admin/brands') }>
                                     Brands
                                 </li>
-                                <li onClick={ () => navigate('/admin/attributes') }>
-                                    Attributes
-                                </li>
                             </ul>
                         </li>
                     </ul>

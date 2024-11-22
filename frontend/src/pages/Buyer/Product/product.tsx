@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { useParams } from 'react-router-dom';
+import { NavLink, useParams } from 'react-router-dom';
 import './product.scss';
 import {
     Select,
@@ -24,7 +24,7 @@ export default function Product(): React.JSX.Element {
     const [loading, setLoading] = React.useState(true);
     const [review, setReview] = React.useState({ comment: '', rating: 0 }); // Review state
     const [reviews, setReviews] = React.useState([]);
-    const [userObj, setUserObj] = React.useState({});
+    const [userObj, setUserObj] = React.useState(null);
     const axios = useAxios();
 
     React.useEffect(() => {
@@ -35,7 +35,6 @@ export default function Product(): React.JSX.Element {
 
       if (productId) {
         fetchProductDetails(Number(productId));
-        fetchReviews(Number(productId));
       }
     }, [productId]);
 
@@ -43,6 +42,9 @@ export default function Product(): React.JSX.Element {
         try {
             const { data } = await axios.get(`/products/${id}`);
             setProduct(data);
+            if (data.hasOwnProperty('reviews')) {
+              setReviews(data.reviews);
+            }
 
             // Set size options from variants
             if (data.variants) {
@@ -57,15 +59,6 @@ export default function Product(): React.JSX.Element {
             console.error('Error fetching product details:', error);
         } finally {
             setLoading(false);
-        }
-    };
-
-    const fetchReviews = async (id: number) => {
-        try {
-            const { data } = await axios.get(`/reviews?productId=${id}`);
-            setReviews(data);
-        } catch (error) {
-            console.error('Error fetching reviews:', error);
         }
     };
 
@@ -96,6 +89,8 @@ export default function Product(): React.JSX.Element {
         }
 
         localStorage.setItem('cart', JSON.stringify(currentCart));
+        const event = new Event('cartUpdate');
+        window.dispatchEvent(event);
         alert('Product added to cart!');
     };
 
@@ -124,7 +119,7 @@ export default function Product(): React.JSX.Element {
         await axios.put('/products/add-review/' + product.id, payload);
         alert('Review submitted successfully!');
         setReview({ comment: '', rating: 0 });
-        fetchReviews(Number(productId)); // Refresh reviews
+        fetchProductDetails(Number(productId));
       } catch (error) {
         console.error('Error submitting review:', error);
       }
@@ -194,45 +189,64 @@ export default function Product(): React.JSX.Element {
                             />
                         </div>
                         <div className="actions pt-4 pb-4">
-                            <Button primary onClick={handleAddToCart}>Add to Cart</Button>
+                            {
+                                userObj !== null ?
+                                <Button primary onClick={handleAddToCart}>Add to Cart</Button> :
+                                <NavLink className='anchor' to={ '/public/login' }>Log In or Sign Up to Buy</NavLink>
+                            }
                         </div>
 
                         <Divider/>
 
                         <div className="reviews pt-3 pb-4 mb-4">
-                          <p className='page-title'>Reviews</p>
+                          <p className='page-title mb-3'>Reviews</p>
                           {
-                            reviews.length > 0 ? (
+                            reviews && reviews.length > 0 ? (
                               reviews.map((review: any) => (
-                                <div key={review.id} className="review">
-                                  <Rating icon="star" defaultRating={review.rating} maxRating={5} disabled />
-                                  <p>{ review.comment }</p>
+                                <div key={review.id} className="review mb-4">
+                                    <p className='font-weight-medium'>
+                                        { review.buyer.firstName + ' ' + review.buyer.lastName }
+                                        {
+                                            review.reviewDate &&
+                                            <span style={{ color: 'gray' }}>
+                                                &nbsp;on { review.reviewDate }
+                                            </span>
+                                        }
+                                    </p>
+                                    <Rating icon="star" defaultRating={review.rating} maxRating={5} disabled />
+                                    <p className='pt-2'>{ review.comment }</p>
                                 </div>
                               ))
                             ) :
                             <p className='mt-2'>No reviews yet.</p>
-                          }
-                          <Form>
-                            <TextArea
-                              className="mb-4"
-                              placeholder="Write a comment..."
-                              value={review.comment}
-                              onChange={(e) => handleReviewChange(e, 'comment')}
-                            />
-                            <Rating
-                              className='mr-3'
-                              icon="star"
-                              maxRating={5}
-                              onRate={handleRatingChange}
-                              rating={review.rating}
-                            />
-                            <Button
-                              className='mb-4'
-                              secondary
-                              onClick={submitReview}>
-                              Submit Review
-                            </Button>
-                          </Form>
+                            }
+                            {
+                                userObj !== null ?
+                                <Form>
+                                    <TextArea
+                                    className="mb-4"
+                                    placeholder="Write a comment..."
+                                    value={review.comment}
+                                    onChange={(e) => handleReviewChange(e, 'comment')}
+                                    />
+                                    <Rating
+                                    className='mr-3'
+                                    icon="star"
+                                    maxRating={5}
+                                    onRate={handleRatingChange}
+                                    rating={review.rating}
+                                    />
+                                    <Button
+                                    className='mb-4'
+                                    secondary
+                                    onClick={submitReview}>
+                                    Submit Review
+                                    </Button>
+                                </Form> :
+                                <div className='mb-4'>
+                                    <NavLink className='anchor' to={ '/public/login' }>Log In or Sign Up to Review</NavLink>
+                                </div>
+                            }
                         </div>
 
                     </div>

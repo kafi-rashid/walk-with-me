@@ -2,7 +2,6 @@ import React, { useContext, useEffect, useState } from 'react';
 import './Header.scss';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../shared/utils';
-import { UserContext } from '../store/UserContext';
 import useAxios from '../shared/axios';
 
 export default function Header(): React.JSX.Element {
@@ -10,35 +9,66 @@ export default function Header(): React.JSX.Element {
     const [showOptions, setShowOptions] = useState(false);
     const [categories, setCategories] = useState<any[]>([]);
     const [subCategories, setSubCategories] = useState<any>({});
-    const { user, setUser } = useContext(UserContext);
+    const [user, setUser] = useState(null);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [cartCount, setCartCount] = useState(0);
     const axios = useAxios();
 
     useEffect(() => {
         getCategories();
-        if (!user?.user?.userId) {
-            const loggedInAs = localStorage.getItem('user');
-            if (loggedInAs) {
-                setUser(JSON.parse(loggedInAs));
-            }
+        updateCartCount();
+
+        const loggedInAs = localStorage.getItem('user');
+        if (loggedInAs) {
+            setUser(JSON.parse(loggedInAs));
         }
+
+        const handleStorageChange = () => {
+            updateCartCount();
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('cartUpdate', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('cartUpdate', handleStorageChange);
+        };
     }, []);
+
+    const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter" && searchQuery.trim()) {
+            navigate(`/search?product=${encodeURIComponent(searchQuery.trim())}`);
+        }
+    };
+
+    const updateCartCount = () => {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const totalItems = cart.reduce((acc: number, item: any) => acc + item.quantity, 0);
+        setCartCount(totalItems);
+    };
+
+    const triggerCartUpdate = () => {
+        const event = new Event('cartUpdate');
+        window.dispatchEvent(event);
+    };
 
     const goToCart = () => {
         navigate('/cart');
-    }
+    };
 
     const getCategories = () => {
         axios.get('/categories/primary-categories')
             .then(({ data }) => {
                 setCategories(data);
                 data.forEach((category: any) => {
-                    getSubCategories(category.id); // Fetch subcategories for each category
+                    getSubCategories(category.id);
                 });
             })
             .catch((error: any) => {
                 console.log('Error fetching categories:', error);
             });
-    }
+    };
 
     const getSubCategories = (categoryId: number) => {
         axios.get(`/categories/${categoryId}/sub-categories`)
@@ -51,7 +81,7 @@ export default function Header(): React.JSX.Element {
             .catch((error: any) => {
                 console.log('Error fetching subcategories:', error);
             });
-    }
+    };
 
     const toggleOptions = () => {
         setShowOptions((prevState) => !prevState);
@@ -59,7 +89,7 @@ export default function Header(): React.JSX.Element {
 
     const handleLogout = () => {
         logout(setUser, navigate);
-    }
+    };
 
     return (
         <div className='page-header'>
@@ -74,7 +104,13 @@ export default function Header(): React.JSX.Element {
                             {category.name}
                             <ul>
                                 {(subCategories[category.id] || []).map((subCategory: any) => (
-                                    <li key={subCategory.id} onClick={() => navigate(`/categories/${category.id}/sub-categories/${subCategory.id}`)}>
+                                    <li 
+                                        key={subCategory.id} 
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/categories/${category.id}/sub-categories/${subCategory.id}`);
+                                        }}
+                                    >
                                         {subCategory.name}
                                     </li>
                                 ))}
@@ -84,23 +120,38 @@ export default function Header(): React.JSX.Element {
                 </ul>
             </div>
 
-            <div className='user'>
-                <button className='cart'
-                    onClick={ goToCart }>
-                    <span className="material-icons">shopping_cart</span>
-                    <span className='counter'>4</span>
-                </button>
-                <p className='greetings'>Hello {user?.firstName} {user?.lastName}!</p>
-                <button onClick={toggleOptions}>
-                    <span className="material-icons">
-                        {showOptions ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-                    </span>
-                </button>
+            <div className='header-search'>
+                <input type='text'
+                    placeholder="Search products by name"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleSearch}/>
+            </div>
 
-                <div className={`options ${showOptions ? 'show' : ''}`}>
-                    <p onClick={ () => navigate('/profile') }>Profile</p>
-                    <p onClick={ handleLogout }>Log Out</p>
-                </div>
+            <div className='user'>
+                {
+                    user !== null ?
+                    <>
+                        <button className='cart' onClick={goToCart}>
+                            <span className="material-icons">shopping_cart</span>
+                            <span className='counter'>{cartCount}</span>
+                        </button>
+                        <p className='greetings'>Hello {user?.firstName} {user?.lastName}!</p>
+                        <button onClick={toggleOptions}>
+                            <span className="material-icons">
+                                {showOptions ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+                            </span>
+                        </button>
+
+                        <div className={`options ${showOptions ? 'show' : ''}`}>
+                            <p onClick={() => navigate('/profile')}>Profile</p>
+                            <p onClick={handleLogout}>Log Out</p>
+                        </div>
+                    </> :
+                    <p className='greetings'
+                        onClick={ () => navigate('/public/login') } >Log In or Sign Up</p>
+                }
+                
             </div>
         </div>
     );

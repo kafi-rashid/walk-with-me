@@ -24,6 +24,7 @@
     font-family: 'Dosis';
     margin: 0;
     text-transform: unset !important;
+    cursor: pointer;
 }
 
 .page-header li {
@@ -170,4 +171,25 @@
     border-radius: 50%;
     line-height: 1;
     cursor: pointer;
+}
+
+.header-search {
+    display: flex;
+    flex: 0.6;
+    input {
+        border: thin solid rgb(190, 183, 183);
+        padding: 10px 20px;
+        outline: none;
+        background-color: transparent;
+        border-radius: 20px;
+        width: 100%;
+        flex: 1;
+        display: flex;
+        transition: 0.3s;
+
+        &:focus {
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
+            border: thin solid rgb(190, 183, 183);
+        }
+    }
 }
