@@ -18,7 +18,7 @@ public class Review {
     private String comment;
     @Column(nullable = false)
     private Integer rating;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(cascade = CascadeType.PERSIST)
     private UserEntity buyer;
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
