@@ -69,6 +69,7 @@ export default function Cart(): React.JSX.Element {
                 <div className="manage-page">
                     <p className="page-title">Cart</p>
                     <Divider />
+
                     <div>
                         <Table>
                             <TableHeader>
@@ -154,6 +155,22 @@ export default function Cart(): React.JSX.Element {
                             }
                         </Table>
                     </div>
+
+                    <div className='d-flex justify-content-between mt-4'>
+                        <div className='d-flex flex-direction-column mr-4' style={{ flex: 1 }}>
+                            <p className='page-title'>
+                                Billing Address
+                            </p>
+                            <Divider/>
+                        </div>
+                        <div className='d-flex flex-direction-column ml-4' style={{ flex: 1 }}>
+                            <p className='page-title'>
+                                Shipping Address
+                            </p>
+                            <Divider/>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
