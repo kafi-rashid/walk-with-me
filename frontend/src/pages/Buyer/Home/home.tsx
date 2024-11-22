@@ -23,7 +23,7 @@ export default function Home(): React.JSX.Element {
 
     const navigate = useNavigate();
     const { user, setUser } = React.useContext(UserContext);
-    const [products, setProducts] = React.useState([]);
+    const [newArrivals, setNewArrivals] = React.useState([]);
     const axios = useAxios();
 
     React.useEffect(() => {
@@ -31,10 +31,10 @@ export default function Home(): React.JSX.Element {
     }, []);
 
     const getNewArrivals = () => {
-        axios.get(API_URL + '/products')
+        axios.get(API_URL + '/products/new-arrival')
             .then(({data}) => {
                 console.log(data)
-                setProducts(data);
+                setNewArrivals(data);
             })
             .catch((error) => {
                 console.log(error)
@@ -48,7 +48,7 @@ export default function Home(): React.JSX.Element {
                     <div className='hero-inner'>
                         <div>
                             <p className='title'>
-                                { products[0]?.name }
+                                { newArrivals[0]?.name }
                                 <br/>
                                 High Method of Make
                             </p>
@@ -168,8 +168,8 @@ export default function Home(): React.JSX.Element {
                     <div className='content'>
                         <div className='new-arrival-items'>
                             {
-                                products?.length > 0 &&
-                                products.map((product: any) => (
+                                newArrivals?.length > 0 &&
+                                newArrivals.map((product: any) => (
                                     <Product product={ product }/>
                                 ))
                             }
