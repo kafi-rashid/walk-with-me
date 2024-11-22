@@ -12,82 +12,42 @@ import {
   Table,
   Menu,
   MenuItem,
-  Input,
   Confirm,
 } from 'semantic-ui-react';
 import useAxios from '../../../shared/axios';
-
-interface Buyer {
-  firstName: string;
-  lastName: string;
-}
-
-interface Product {
-  id: number;
-  name: string;
-}
 
 interface Review {
   id: number;
   comment: string;
   rating: number;
-  buyer: Buyer;
-  product: Product;
+  productId: number | null;
+  productName: string;
+  buyerId: number | null;
+  buyerFistName: string;
+  buyerLastName: string;
+  reviewDate: string | null;
 }
 
 export default function Reviews(): React.JSX.Element {
   const [reviews, setReviews] = React.useState<Review[]>([]);
-  const [editingReviewId, setEditingReviewId] = React.useState<number | null>(null);
-  const [editingComment, setEditingComment] = React.useState<string>('');
   const [confirmDeleteId, setConfirmDeleteId] = React.useState<number | null>(null);
   const axios = useAxios();
 
   React.useEffect(() => {
-    axios.get('/products/reviews')
+    axios
+      .get('/reviews')
       .then(({ data }) => {
         setReviews(data);
       })
       .catch((error) => {
-        console.log("Error", error);
+        console.log('Error fetching reviews:', error);
       });
   }, []);
 
-  const startEditing = (reviewId: number, currentComment: string) => {
-    setEditingReviewId(reviewId);
-    setEditingComment(currentComment);
-  };
-
-  const saveEdit = (reviewId: number) => {
-    if (editingComment.trim().length <= 0) {
-      setEditingReviewId(null);
-      setEditingComment('');
-      return;
-    }
-    axios.put(`/reviews/${reviewId}`, { comment: editingComment })
-      .then(() => {
-        setReviews((prevReviews) =>
-          prevReviews.map((review) =>
-            review.id === reviewId ? { ...review, comment: editingComment } : review
-          )
-        );
-        setEditingReviewId(null);
-        setEditingComment('');
-      })
-      .catch((error) => {
-        console.log("Error updating review:", error);
-        setEditingReviewId(null);
-      });
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent, reviewId: number) => {
-    if (e.key === 'Enter') {
-      saveEdit(reviewId);
-    }
-  };
-
   const deleteReview = () => {
     if (confirmDeleteId !== null) {
-      axios.delete(`/reviews/${confirmDeleteId}`)
+      axios
+        .delete(`/reviews/${confirmDeleteId}`)
         .then(() => {
           setReviews((prevReviews) =>
             prevReviews.filter((review) => review.id !== confirmDeleteId)
@@ -95,7 +55,7 @@ export default function Reviews(): React.JSX.Element {
           setConfirmDeleteId(null); // Close the confirmation dialog
         })
         .catch((error) => {
-          console.log("Error deleting review:", error);
+          console.log('Error deleting review:', error);
         });
     }
   };
@@ -116,10 +76,10 @@ export default function Reviews(): React.JSX.Element {
           <TableHeader>
             <TableRow>
               <TableHeaderCell style={{ width: '50px' }}>ID</TableHeaderCell>
+              <TableHeaderCell style={{ width: '300px' }}>Product</TableHeaderCell>
+              <TableHeaderCell style={{ width: '80px' }}>Rating</TableHeaderCell>
               <TableHeaderCell>Comment</TableHeaderCell>
-              <TableHeaderCell>Rating</TableHeaderCell>
-              <TableHeaderCell>Buyer</TableHeaderCell>
-              <TableHeaderCell>Product</TableHeaderCell>
+              <TableHeaderCell style={{ width: '200px' }}>Buyer</TableHeaderCell>
               <TableHeaderCell>Actions</TableHeaderCell>
             </TableRow>
           </TableHeader>
@@ -128,22 +88,10 @@ export default function Reviews(): React.JSX.Element {
             {reviews.map((review) => (
               <TableRow key={review.id}>
                 <TableCell>{review.id}</TableCell>
-                <TableCell onDoubleClick={() => startEditing(review.id, review.comment)}>
-                  {editingReviewId === review.id ? (
-                    <Input
-                      value={editingComment}
-                      onChange={(e) => setEditingComment(e.target.value)}
-                      onBlur={() => saveEdit(review.id)}
-                      onKeyDown={(e) => handleKeyDown(e, review.id)}
-                      autoFocus
-                    />
-                  ) : (
-                    review.comment
-                  )}
-                </TableCell>
+                <TableCell>{review.productName}</TableCell>
                 <TableCell>{review.rating}</TableCell>
-                <TableCell>{`${review.buyer.firstName} ${review.buyer.lastName}`}</TableCell>
-                <TableCell>{review.product.name}</TableCell>
+                <TableCell>{review.comment}</TableCell>
+                <TableCell>{`${review.buyerFistName} ${review.buyerLastName}`}</TableCell>
                 <TableCell className="delete-column">
                   <Button
                     icon
@@ -160,17 +108,17 @@ export default function Reviews(): React.JSX.Element {
 
           <TableFooter fullWidth>
             <TableRow>
-              <TableHeaderCell colSpan='7'>
-                <Menu floated='right' pagination>
-                  <MenuItem as='a' icon>
-                    <Icon name='chevron left' />
+              <TableHeaderCell colSpan="6">
+                <Menu floated="right" pagination>
+                  <MenuItem as="a" icon>
+                    <Icon name="chevron left" />
                   </MenuItem>
-                  <MenuItem as='a'>1</MenuItem>
-                  <MenuItem as='a'>2</MenuItem>
-                  <MenuItem as='a'>3</MenuItem>
-                  <MenuItem as='a'>4</MenuItem>
-                  <MenuItem as='a' icon>
-                    <Icon name='chevron right' />
+                  <MenuItem as="a">1</MenuItem>
+                  <MenuItem as="a">2</MenuItem>
+                  <MenuItem as="a">3</MenuItem>
+                  <MenuItem as="a">4</MenuItem>
+                  <MenuItem as="a" icon>
+                    <Icon name="chevron right" />
                   </MenuItem>
                 </Menu>
               </TableHeaderCell>
@@ -181,7 +129,7 @@ export default function Reviews(): React.JSX.Element {
         {/* Confirmation Dialog */}
         <Confirm
           open={confirmDeleteId !== null}
-          header='Delete Review'
+          header="Delete Review"
           content={`Are you sure you want to delete this review?`}
           onCancel={cancelDelete}
           onConfirm={deleteReview}
