@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,6 +57,7 @@ public class ProductServiceImpl implements ProductService {
                 UserEntity user = userRepository.findById(productDTO.getSellerId())
                         .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + productDTO.getSellerId()));
                 product.setSeller(user);
+
             }
 
             // Set Parent Category
@@ -115,6 +117,7 @@ public class ProductServiceImpl implements ProductService {
             review.setComment(reviewDto.getComment());
             review.setRating(reviewDto.getRating());
             review.setReviewDate(reviewDto.getReviewDate());
+            review.setReviewDate(LocalDateTime.now());
             review.setProduct(product);
 
             if (reviewDto.getBuyerId() != null && reviewDto.getBuyerId() > 0) {
@@ -152,13 +155,14 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductListDto> filterProducts(Long brandId, Long parentCategoryId, Long childCategoryId, Long sellerId) {
+    public List<ProductListDto> filterProducts(Long brandId, Long parentCategoryId, Long childCategoryId, Long sellerId, String productName) {
         return productRepository.findAll()
                 .stream()
-                .filter(product -> brandId == null || brandId != 0 && product.getBrand().getId().equals(brandId))
-                .filter(product -> parentCategoryId == null || parentCategoryId != 0 && product.getParentCategory().getId().equals(parentCategoryId))
-                .filter(product -> childCategoryId == null || childCategoryId != 0 && product.getSubCategory().getId().equals(childCategoryId))
-                .filter(product -> sellerId == null || sellerId != 0 && product.getSeller().getId().equals(sellerId))
+                .filter(product -> brandId == null || product.getBrand().getId().equals(brandId))
+                .filter(product -> productName == null || product.getName().equalsIgnoreCase(productName))
+                .filter(product -> parentCategoryId == null || product.getParentCategory().getId().equals(parentCategoryId))
+                .filter(product -> childCategoryId == null || product.getSubCategory().getId().equals(childCategoryId))
+                .filter(product -> sellerId == null || product.getSeller().getId().equals(sellerId))
                 .map(this::mapToListDTO)
                 .toList();
     }
@@ -426,6 +430,7 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                 .build();
     }
     private ReviewDto mapReviewToDTO(Review review) {
+        System.out.println(review.getProduct()+"Prianka rev");
         return ReviewDto.builder()
                 .id(review.getId())
                 .comment(review.getComment())

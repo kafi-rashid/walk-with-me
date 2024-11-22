@@ -12,7 +12,10 @@ public class ReviewDto {
     private String comment;
     private Integer rating;
     private Long productId;
+    private String productName;
     private Long buyerId;
+    private String buyerFistName;
+    private String buyerLastName;
     private LocalDateTime reviewDate;
     private SellerBuyerDto buyer;
 }
