@@ -440,7 +440,7 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
     private SellerBuyerDto mapSallerBuyerToDTO(UserEntity user) {
         return SellerBuyerDto.builder()
                 .id(user.getId())
-                .fristName(user.getFirstName())
+                .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .build();
     }

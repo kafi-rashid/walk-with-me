@@ -237,6 +237,10 @@ p {
     font-weight: bold;
 }
 
+.font-weight-medium {
+    font-weight: 600;
+}
+
 .font-weight-normal {
     font-weight: 400;
 }
@@ -256,4 +260,15 @@ p {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+.page-title {
+    font-size: 20px;
+    font-family: 'Dosis';
+    font-weight: 700;
+    margin: 0;
+}
+
+.font-size-small {
+    font-size: 13px;
 }

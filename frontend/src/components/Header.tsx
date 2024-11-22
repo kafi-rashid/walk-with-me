@@ -15,7 +15,17 @@ export default function Header(): React.JSX.Element {
 
     useEffect(() => {
         getCategories();
+        if (!user?.user?.userId) {
+            const loggedInAs = localStorage.getItem('user');
+            if (loggedInAs) {
+                setUser(JSON.parse(loggedInAs));
+            }
+        }
     }, []);
+
+    const goToCart = () => {
+        navigate('/cart');
+    }
 
     const getCategories = () => {
         axios.get('/categories/primary-categories')
@@ -75,7 +85,8 @@ export default function Header(): React.JSX.Element {
             </div>
 
             <div className='user'>
-                <button className='cart'>
+                <button className='cart'
+                    onClick={ goToCart }>
                     <span className="material-icons">shopping_cart</span>
                     <span className='counter'>4</span>
                 </button>
