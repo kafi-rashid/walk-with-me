@@ -16,6 +16,7 @@ import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../../store/UserContext';
 
 import useAxios from '../../../shared/axios';
+import Product from '../../../components/Product';
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Home(): React.JSX.Element {
@@ -46,7 +47,11 @@ export default function Home(): React.JSX.Element {
                 <div className='hero'>
                     <div className='hero-inner'>
                         <div>
-                            <p className='title'>Air Jordan 1 High Method of Make</p>
+                            <p className='title'>
+                                { products[0]?.name }
+                                <br/>
+                                High Method of Make
+                            </p>
                             <p className='subtitle'>Womens' Shoes</p>
                             <p className='price'>$90</p>
                             <button className='add-to-cart'>
@@ -165,98 +170,9 @@ export default function Home(): React.JSX.Element {
                             {
                                 products?.length > 0 &&
                                 products.map((product: any) => (
-                                    <div key={product?.id} className="product-card" onClick={() => navigate(`/products/${product?.id}`)}>
-                                    <div className="product-card-inner">
-                                        <div>
-                                        <p className="title">{product?.name}</p>
-                                        <p className="brand">{product?.brand?.name}</p>
-                                        <p className="price">{product?.price}</p>
-                                        <p className="material-icons">arrow_forward</p>
-                                        </div>
-                                        <img src={product?.image} alt={product?.name} />
-                                    </div>
-                                    </div>
+                                    <Product product={ product }/>
                                 ))
                             }
-
-                            {/* <div className='product-card' onClick={ () => navigate('/products/1') }>
-                                <div className='product-card-inner'>
-                                    <div>
-                                        <p className='title'>Air Max Dd</p>
-                                        <p className='brand'>Nike</p>
-                                        <p className='price'>$160</p>
-                                        <p className="material-icons">
-                                            arrow_forward
-                                        </p>
-                                    </div>
-                                    <img src={ Shoe2 }/>
-                                </div>
-                            </div>
-                            <div className='product-card' onClick={ () => navigate('/products/1') }>
-                                <div className='product-card-inner'>
-                                    <div>
-                                        <p className='title'>Dunk Low Lx</p>
-                                        <p className='brand'>Nike</p>
-                                        <p className='price'>$90</p>
-                                        <p className="material-icons">
-                                            arrow_forward
-                                        </p>
-                                    </div>
-                                    <img src={ Shoe3 }/>
-                                </div>
-                            </div>
-                            <div className='product-card' onClick={ () => navigate('/products/1') }>
-                                <div className='product-card-inner'>
-                                    <div>
-                                        <p className='title'>Air Max 90</p>
-                                        <p className='brand'>Nike</p>
-                                        <p className='price'>$150</p>
-                                        <p className="material-icons">
-                                            arrow_forward
-                                        </p>
-                                    </div>
-                                    <img src={ Shoe4 }/>
-                                </div>
-                            </div>
-                            <div className='product-card' onClick={ () => navigate('/products/1') }>
-                                <div className='product-card-inner'>
-                                    <div>
-                                        <p className='title'>Air Max Dd</p>
-                                        <p className='brand'>Nike</p>
-                                        <p className='price'>$160</p>
-                                        <p className="material-icons">
-                                            arrow_forward
-                                        </p>
-                                    </div>
-                                    <img src={ Shoe5 }/>
-                                </div>
-                            </div>
-                            <div className='product-card' onClick={ () => navigate('/products/1') }>
-                                <div className='product-card-inner'>
-                                    <div>
-                                        <p className='title'>Dunk Low Lx</p>
-                                        <p className='brand'>Nike</p>
-                                        <p className='price'>$90</p>
-                                        <p className="material-icons">
-                                            arrow_forward
-                                        </p>
-                                    </div>
-                                    <img src={ Shoe6 }/>
-                                </div>
-                            </div>
-                            <div className='product-card' onClick={ () => navigate('/products/1') }>
-                                <div className='product-card-inner'>
-                                    <div>
-                                        <p className='title'>Free Metcon 6</p>
-                                        <p className='brand'>Nike</p>
-                                        <p className='price'>$120</p>
-                                        <p className="material-icons">
-                                            arrow_forward
-                                        </p>
-                                    </div>
-                                    <img src={ Shoe7 }/>
-                                </div>
-                            </div> */}
                         </div>
                     </div>
                 </div>
