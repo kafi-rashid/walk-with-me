@@ -33,11 +33,17 @@ export default function ProductDetails(): React.JSX.Element {
   const [brands, setBrands] = React.useState([]);
   const [categories, setCategories] = React.useState([]);
   const [subcategories, setSubcategories] = React.useState([]);
-
-  const { user, setUser } = React.useContext(UserContext);
+  const [userObj, setUserObj] = React.useState({});
   const navigate = useNavigate();
 
   const axios = useAxios();
+
+  React.useEffect(() => {
+    const user = localStorage.getItem('user');
+    if (user) {
+      setUserObj(JSON.parse(user));
+    }
+  }, [])
 
   React.useEffect(() => {
     getBrands();
@@ -112,12 +118,6 @@ export default function ProductDetails(): React.JSX.Element {
   };
 
   const handleSubmit = () => {
-    if (!user?.user?.userId) {
-      const loggedInAs = localStorage.getItem('user');
-      if (loggedInAs) {
-        setUser(JSON.parse(loggedInAs));
-      }
-    }
     const payload = {
       name,
       description,
@@ -127,7 +127,7 @@ export default function ProductDetails(): React.JSX.Element {
       parentCategoryId,
       childCategoryId,
       variants,
-      sellerId: user?.user?.userId
+      sellerId: userObj?.userId ?? null
     };
 
     if (productId) {
