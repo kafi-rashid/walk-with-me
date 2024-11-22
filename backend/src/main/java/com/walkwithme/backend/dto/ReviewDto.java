@@ -2,6 +2,9 @@ package com.walkwithme.backend.dto;
 
 import lombok.Builder;
 import lombok.Data;
+
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 public class ReviewDto {
@@ -10,6 +13,6 @@ public class ReviewDto {
     private Integer rating;
     private Long productId;
     private Long buyerId;
-    private String reviewDate;
+    private LocalDateTime reviewDate;
     private SellerBuyerDto buyer;
 }
