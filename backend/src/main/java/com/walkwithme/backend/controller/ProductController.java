@@ -78,8 +78,8 @@ public class ProductController {
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
     @GetMapping("/filter")
-    public ResponseEntity<List<ProductListDto>> filterProducts(@RequestParam Long brandId) {
-        List<ProductListDto> products = productService.filterProducts(brandId);
+    public ResponseEntity<List<ProductListDto>> filterProducts(@RequestParam(required = false) Long brandId, @RequestParam(required = false) Long parentCategoryId, @RequestParam(required = false) Long childCategoryId, @RequestParam(required = false) Long sellerId) {
+        List<ProductListDto> products = productService.filterProducts(brandId, parentCategoryId, childCategoryId, sellerId);
         return new ResponseEntity<>(products, HttpStatus.OK);
     }
 }
