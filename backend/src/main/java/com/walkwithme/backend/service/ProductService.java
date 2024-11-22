@@ -14,7 +14,7 @@ public interface ProductService {
     List<ProductListDto> getTopSellingProducts();
     List<ProductListDto> getNewArrivalProducts();
     List<ProductListDto> filterProducts(Long brandId);
-    ProductDTO getProductById(Long id);
+    ProductListDto getProductById(Long id);
 
     List<ProductListDto> getAllProducts();
 

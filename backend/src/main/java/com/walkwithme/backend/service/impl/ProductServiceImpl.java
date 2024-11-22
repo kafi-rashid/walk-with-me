@@ -165,9 +165,9 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public ProductDTO getProductById(Long id) {
+    public ProductListDto getProductById(Long id) {
         return productRepository.findById(id)
-                .map(this::mapToDTO)
+                .map(this::mapToListDTO)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
     }
 
