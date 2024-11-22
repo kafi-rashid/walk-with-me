@@ -4,6 +4,7 @@ import com.walkwithme.backend.dto.ProductDTO;
 import com.walkwithme.backend.dto.ProductDetailDTO;
 import com.walkwithme.backend.dto.ProductListDto;
 import com.walkwithme.backend.dto.ReviewDto;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public interface ProductService {
 
     List<ProductListDto> getTopSellingProducts();
     List<ProductListDto> getNewArrivalProducts();
-    List<ProductListDto> filterProducts(Long brandId);
+    List<ProductListDto> filterProducts(Long brandId, Long parentCategoryId,  Long childCategoryId, Long sellerId) ;
     ProductListDto getProductById(Long id);
 
     List<ProductListDto> getAllProducts();

@@ -152,17 +152,17 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public List<ProductListDto> filterProducts(Long brandId) {
-//        return productRepository.findByBrandId(brandId)
-//                .stream()
-//                .map(this::mapToListDTO)
-//                .toList();
+    public List<ProductListDto> filterProducts(Long brandId, Long parentCategoryId, Long childCategoryId, Long sellerId) {
         return productRepository.findAll()
                 .stream()
-                .filter(product -> product.getBrand().getId().equals(brandId))
+                .filter(product -> brandId == null || brandId != 0 && product.getBrand().getId().equals(brandId))
+                .filter(product -> parentCategoryId == null || parentCategoryId != 0 && product.getParentCategory().getId().equals(parentCategoryId))
+                .filter(product -> childCategoryId == null || childCategoryId != 0 && product.getSubCategory().getId().equals(childCategoryId))
+                .filter(product -> sellerId == null || sellerId != 0 && product.getSeller().getId().equals(sellerId))
                 .map(this::mapToListDTO)
                 .toList();
     }
+
 
     @Override
     public ProductListDto getProductById(Long id) {
