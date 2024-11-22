@@ -12,16 +12,62 @@ import {
     TableFooter,
     Input
 } from 'semantic-ui-react';
+import useAxios from '../../../shared/axios';
 
 export default function Cart(): React.JSX.Element {
     const [products, setProducts] = React.useState<any[]>([]);
+    const axios = useAxios();
+    const [userObj, setUserObj] = React.useState('');
+    const [userProfile, setUserProfile] = React.useState({});
+
+    const [shippingAddress, setShippingAddress] = React.useState({
+        street: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        country: ''
+    });
+    const [billingAddress, setBillingAddress] = React.useState({
+        street: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        country: ''
+    });
 
     React.useEffect(() => {
         const storedItems = localStorage.getItem('cart');
         if (storedItems) {
             setProducts(JSON.parse(storedItems));
         }
+
+        const user = localStorage.getItem('user');
+        if (user) {
+            setUserObj(JSON.parse(user));
+        }
     }, []);
+
+    React.useEffect(() => {
+        if (userObj) {
+            getUserDetails();
+        }
+    }, [userObj]);
+
+    const getUserDetails = () => {
+        axios.get('/users/' + userObj?.userId)
+            .then(({ data }) => {
+                setUserProfile(data);
+                if (data.hasOwnProperty('billingAddress')) {
+                    setBillingAddress(data.billingAddress)
+                }
+                if (data.hasOwnProperty('shippingAddress')) {
+                    setShippingAddress(data.shippingAddress)
+                }
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
 
     const updateCartInLocalStorage = (updatedCart: any[]) => {
         localStorage.setItem('cart', JSON.stringify(updatedCart));
@@ -167,23 +213,23 @@ export default function Cart(): React.JSX.Element {
                                 <table>
                                     <tr>
                                         <td>Street Address</td>
-                                        <td>: aaa</td>
+                                        <td>: { shippingAddress.street }</td>
                                     </tr>
                                     <tr>
                                         <td>City</td>
-                                        <td>: aaa</td>
+                                        <td>: { shippingAddress.city }</td>
                                     </tr>
                                     <tr>
                                         <td>State</td>
-                                        <td>: aaa</td>
+                                        <td>: { shippingAddress.state }</td>
                                     </tr>
                                     <tr>
                                         <td>Zip</td>
-                                        <td>: aaa</td>
+                                        <td>: { shippingAddress.zipCode }</td>
                                     </tr>
                                     <tr>
                                         <td>Country</td>
-                                        <td>: aaa</td>
+                                        <td>: { shippingAddress.country }</td>
                                     </tr>
                                 </table>
                             </div>
@@ -197,23 +243,23 @@ export default function Cart(): React.JSX.Element {
                                 <table>
                                     <tr>
                                         <td>Street Address</td>
-                                        <td>: aaa</td>
+                                        <td>: { billingAddress.street }</td>
                                     </tr>
                                     <tr>
                                         <td>City</td>
-                                        <td>: aaa</td>
+                                        <td>: { billingAddress.city }</td>
                                     </tr>
                                     <tr>
                                         <td>State</td>
-                                        <td>: aaa</td>
+                                        <td>: { billingAddress.state }</td>
                                     </tr>
                                     <tr>
                                         <td>Zip</td>
-                                        <td>: aaa</td>
+                                        <td>: { billingAddress.zipCode }</td>
                                     </tr>
                                     <tr>
                                         <td>Country</td>
-                                        <td>: aaa</td>
+                                        <td>: { billingAddress.country }</td>
                                     </tr>
                                 </table>
                             </div>

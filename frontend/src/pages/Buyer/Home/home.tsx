@@ -61,7 +61,7 @@ export default function Home(): React.JSX.Element {
                                 { newArrivals[0]?.parentCategory.name }
                             </p>
                             <p className='price'>
-                                { newArrivals[0]?.price }
+                                ${ newArrivals[0]?.price }
                             </p>
                             <button className='add-to-cart'
                                 onClick={ () => navigate('/products/' + newArrivals[0]?.id) }>

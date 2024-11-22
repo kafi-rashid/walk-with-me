@@ -1,12 +1,12 @@
 import * as React from 'react';
-import { Button, Divider, Input } from 'semantic-ui-react';
+import { Button, Divider, Input, Message } from 'semantic-ui-react';
 import './profile.scss';
 import useAxios from '../../../shared/axios';
 
 export default function Profile(): React.JSX.Element {
     const axios = useAxios();
     const [userObj, setUserObj] = React.useState('');
-    const [userProfile, setUserProfile] = React.useState({});
+    const [userProfile, setUserProfile] = React.useState<any>({});
     const [shippingAddress, setShippingAddress] = React.useState({
         street: '',
         city: '',
@@ -21,6 +21,9 @@ export default function Profile(): React.JSX.Element {
         zipCode: '',
         country: ''
     });
+    const [loading, setLoading] = React.useState(false);
+    const [successMessage, setSuccessMessage] = React.useState('');
+    const [errorMessage, setErrorMessage] = React.useState('');
 
     React.useEffect(() => {
         const user = localStorage.getItem('user');
@@ -36,12 +39,19 @@ export default function Profile(): React.JSX.Element {
     }, [userObj]);
 
     const getUserDetails = () => {
+        setLoading(true);
         axios.get('/users/' + userObj?.userId)
             .then(({ data }) => {
                 setUserProfile(data);
+                setShippingAddress(data.shippingAddress || shippingAddress);
+                setBillingAddress(data.billingAddress || billingAddress);
             })
             .catch((error) => {
-                console.log(error);
+                console.error(error);
+                setErrorMessage('Failed to fetch user details.');
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
 
@@ -55,19 +65,24 @@ export default function Profile(): React.JSX.Element {
     };
 
     const updateAddress = () => {
+        setLoading(true);
         const payload = {
-            id: userProfile.id,
+            ...userProfile,
             billingAddress,
             shippingAddress
         };
 
-        console.log(payload);
         axios.put('/users/' + userObj.userId, payload)
             .then(({ data }) => {
-                console.log(data);
+                setSuccessMessage('Address updated successfully.');
+                setUserProfile(data);
             })
             .catch((error) => {
-                console.log(error);
+                console.error(error);
+                setErrorMessage('Failed to update address.');
+            })
+            .finally(() => {
+                setLoading(false);
             });
     };
 
@@ -77,6 +92,9 @@ export default function Profile(): React.JSX.Element {
                 <div className="manage-page">
                     <p className="page-title">Profile</p>
                     <Divider />
+
+                    {successMessage && <Message positive>{successMessage}</Message>}
+                    {errorMessage && <Message negative>{errorMessage}</Message>}
 
                     <div className="d-flex flex-direction-column address-wrapper">
                         <p className="page-title mb-3">Shipping Address</p>
@@ -166,8 +184,8 @@ export default function Profile(): React.JSX.Element {
 
                     <Divider />
 
-                    <Button size="small" primary onClick={updateAddress}>
-                        Update
+                    <Button size="small" primary onClick={updateAddress} disabled={loading}>
+                        {loading ? 'Updating...' : 'Update'}
                     </Button>
                 </div>
             </div>
