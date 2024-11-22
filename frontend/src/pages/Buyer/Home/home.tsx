@@ -1,9 +1,5 @@
 import * as React from 'react';
 import './home.scss';
-import bannerShoe from '../../../assets/images/banner-shoe.png';
-import Shoe1 from '../../../assets/images/dummy/shoe-1.png';
-import Shoe2 from '../../../assets/images/dummy/shoe-2.png';
-import Shoe3 from '../../../assets/images/dummy/shoe-3.png';
 import { useNavigate } from 'react-router-dom';
 import { UserContext } from '../../../store/UserContext';
 

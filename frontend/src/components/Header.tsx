@@ -11,21 +11,47 @@ export default function Header(): React.JSX.Element {
     const [categories, setCategories] = useState<any[]>([]);
     const [subCategories, setSubCategories] = useState<any>({});
     const { user, setUser } = useContext(UserContext);
+    const [cartCount, setCartCount] = useState(0); // Cart counter state
     const axios = useAxios();
 
     useEffect(() => {
         getCategories();
-        if (!user?.user?.userId) {
-            const loggedInAs = localStorage.getItem('user');
-            if (loggedInAs) {
-                setUser(JSON.parse(loggedInAs));
-            }
+        updateCartCount(); // Update cart count on load
+
+        const loggedInAs = localStorage.getItem('user');
+        if (loggedInAs) {
+            setUser(JSON.parse(loggedInAs));
         }
+
+        // Listen for changes to localStorage or custom cart events
+        const handleStorageChange = () => {
+            updateCartCount();
+        };
+
+        window.addEventListener('storage', handleStorageChange);
+        window.addEventListener('cartUpdate', handleStorageChange);
+
+        return () => {
+            window.removeEventListener('storage', handleStorageChange);
+            window.removeEventListener('cartUpdate', handleStorageChange);
+        };
     }, []);
+
+    const updateCartCount = () => {
+        const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+        const totalItems = cart.reduce((acc: number, item: any) => acc + item.quantity, 0);
+        setCartCount(totalItems);
+    };
+
+    const triggerCartUpdate = () => {
+        // Dispatch a custom event to notify other components of cart changes
+        const event = new Event('cartUpdate');
+        window.dispatchEvent(event);
+    };
 
     const goToCart = () => {
         navigate('/cart');
-    }
+    };
 
     const getCategories = () => {
         axios.get('/categories/primary-categories')
@@ -38,7 +64,7 @@ export default function Header(): React.JSX.Element {
             .catch((error: any) => {
                 console.log('Error fetching categories:', error);
             });
-    }
+    };
 
     const getSubCategories = (categoryId: number) => {
         axios.get(`/categories/${categoryId}/sub-categories`)
@@ -51,7 +77,7 @@ export default function Header(): React.JSX.Element {
             .catch((error: any) => {
                 console.log('Error fetching subcategories:', error);
             });
-    }
+    };
 
     const toggleOptions = () => {
         setShowOptions((prevState) => !prevState);
@@ -59,7 +85,7 @@ export default function Header(): React.JSX.Element {
 
     const handleLogout = () => {
         logout(setUser, navigate);
-    }
+    };
 
     return (
         <div className='page-header'>
@@ -74,7 +100,13 @@ export default function Header(): React.JSX.Element {
                             {category.name}
                             <ul>
                                 {(subCategories[category.id] || []).map((subCategory: any) => (
-                                    <li key={subCategory.id} onClick={() => navigate(`/categories/${category.id}/sub-categories/${subCategory.id}`)}>
+                                    <li 
+                                        key={subCategory.id} 
+                                        onClick={(e) => {
+                                            e.stopPropagation(); // Prevent parent click events
+                                            navigate(`/categories/${category.id}/sub-categories/${subCategory.id}`);
+                                        }}
+                                    >
                                         {subCategory.name}
                                     </li>
                                 ))}
@@ -85,10 +117,9 @@ export default function Header(): React.JSX.Element {
             </div>
 
             <div className='user'>
-                <button className='cart'
-                    onClick={ goToCart }>
+                <button className='cart' onClick={goToCart}>
                     <span className="material-icons">shopping_cart</span>
-                    <span className='counter'>4</span>
+                    <span className='counter'>{cartCount}</span> {/* Dynamic cart counter */}
                 </button>
                 <p className='greetings'>Hello {user?.firstName} {user?.lastName}!</p>
                 <button onClick={toggleOptions}>
@@ -98,8 +129,8 @@ export default function Header(): React.JSX.Element {
                 </button>
 
                 <div className={`options ${showOptions ? 'show' : ''}`}>
-                    <p onClick={ () => navigate('/profile') }>Profile</p>
-                    <p onClick={ handleLogout }>Log Out</p>
+                    <p onClick={() => navigate('/profile')}>Profile</p>
+                    <p onClick={handleLogout}>Log Out</p>
                 </div>
             </div>
         </div>

@@ -24,14 +24,14 @@ export default function Cart(): React.JSX.Element {
         street: '',
         city: '',
         state: '',
-        zipCode: '',
+        postalCode: '',
         country: ''
     });
     const [billingAddress, setBillingAddress] = React.useState({
         street: '',
         city: '',
         state: '',
-        zipCode: '',
+        postalCode: '',
         country: ''
     });
 
@@ -72,6 +72,8 @@ export default function Cart(): React.JSX.Element {
     const updateCartInLocalStorage = (updatedCart: any[]) => {
         localStorage.setItem('cart', JSON.stringify(updatedCart));
         setProducts(updatedCart);
+        const event = new Event('cartUpdate');
+        window.dispatchEvent(event);
     };
 
     const incrementQuantity = (variantId: number) => {
@@ -225,7 +227,7 @@ export default function Cart(): React.JSX.Element {
                                     </tr>
                                     <tr>
                                         <td>Zip</td>
-                                        <td>: { shippingAddress.zipCode }</td>
+                                        <td>: { shippingAddress.postalCode }</td>
                                     </tr>
                                     <tr>
                                         <td>Country</td>
@@ -255,7 +257,7 @@ export default function Cart(): React.JSX.Element {
                                     </tr>
                                     <tr>
                                         <td>Zip</td>
-                                        <td>: { billingAddress.zipCode }</td>
+                                        <td>: { billingAddress.postalCode }</td>
                                     </tr>
                                     <tr>
                                         <td>Country</td>

@@ -35,7 +35,6 @@ export default function Product(): React.JSX.Element {
 
       if (productId) {
         fetchProductDetails(Number(productId));
-        fetchReviews(Number(productId));
       }
     }, [productId]);
 
@@ -43,6 +42,9 @@ export default function Product(): React.JSX.Element {
         try {
             const { data } = await axios.get(`/products/${id}`);
             setProduct(data);
+            if (data.hasOwnProperty('reviews')) {
+              setReviews(data.reviews);
+            }
 
             // Set size options from variants
             if (data.variants) {
@@ -57,15 +59,6 @@ export default function Product(): React.JSX.Element {
             console.error('Error fetching product details:', error);
         } finally {
             setLoading(false);
-        }
-    };
-
-    const fetchReviews = async (id: number) => {
-        try {
-            const { data } = await axios.get(`/reviews?productId=${id}`);
-            setReviews(data);
-        } catch (error) {
-            console.error('Error fetching reviews:', error);
         }
     };
 
@@ -96,6 +89,8 @@ export default function Product(): React.JSX.Element {
         }
 
         localStorage.setItem('cart', JSON.stringify(currentCart));
+        const event = new Event('cartUpdate');
+        window.dispatchEvent(event);
         alert('Product added to cart!');
     };
 
@@ -200,13 +195,14 @@ export default function Product(): React.JSX.Element {
                         <Divider/>
 
                         <div className="reviews pt-3 pb-4 mb-4">
-                          <p className='page-title'>Reviews</p>
+                          <p className='page-title mb-3'>Reviews</p>
                           {
-                            reviews.length > 0 ? (
+                            reviews && reviews.length > 0 ? (
                               reviews.map((review: any) => (
-                                <div key={review.id} className="review">
+                                <div key={review.id} className="review mb-4">
+                                  <p className='font-weight-medium'>{ review.buyer.firstName + ' ' + review.buyer.lastName }</p>
                                   <Rating icon="star" defaultRating={review.rating} maxRating={5} disabled />
-                                  <p>{ review.comment }</p>
+                                  <p className='pt-2'>{ review.comment }</p>
                                 </div>
                               ))
                             ) :
