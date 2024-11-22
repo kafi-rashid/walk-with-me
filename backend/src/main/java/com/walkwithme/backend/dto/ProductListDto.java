@@ -17,4 +17,5 @@ public class ProductListDto {
         private DiscountDTO discount;
         private SellerBuyerDto seller;
         private List<ProductVariantDTO> variants;
+        private List<ReviewDto> reviews;
 }

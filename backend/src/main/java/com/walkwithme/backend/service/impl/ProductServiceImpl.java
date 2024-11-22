@@ -178,48 +178,6 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-//    @Override
-//    public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
-//        try {
-//            Product product = productRepository.findById(id)
-//                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
-//
-//            product.setName(productDTO.getName());
-//            product.setDescription(productDTO.getDescription());
-//            product.setPrice(productDTO.getPrice());
-//            product.setImage(productDTO.getImage());
-//
-//            if (productDTO.getBrandId() != null) {
-//                Brand brand = brandRepository.findById(productDTO.getBrandId())
-//                        .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
-//                product.setBrand(brand);
-//            }
-//
-//            if (productDTO.getParentCategoryId() != null) {
-//                System.out.println("Parent category add"+productDTO.getParentCategoryId());
-//                Category parentCategory = categoryRepository.findById(productDTO.getParentCategoryId())
-//                        .orElseThrow(() -> new IllegalArgumentException("Category not found"));
-//                product.setParentCategory(parentCategory);
-//            }
-//            if (productDTO.getChildCategoryId() != null) {
-//                System.out.println("Child category add"+productDTO.getChildCategoryId());
-//                Category childCategory = categoryRepository.findById(productDTO.getChildCategoryId())
-//                        .orElseThrow(() -> new IllegalArgumentException("Category not found"));
-//                product.setSubCategory(childCategory);
-//            }
-//
-//            if (productDTO.getDiscountId() != null) {
-//                Discount discount = discountRepository.findById(productDTO.getDiscountId())
-//                        .orElseThrow(() -> new IllegalArgumentException("Discount not found"));
-//                product.setDiscount(discount);
-//            }
-//
-//            Product updatedProduct = productRepository.save(product);
-//            return mapToDTO(updatedProduct);
-//        } catch (Exception e) {
-//            throw new IllegalArgumentException("Error updating product: " + e.getMessage());
-//        }
-//    }
 @Override
 public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
     try {
@@ -428,6 +386,7 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                                 .collect(Collectors.toList()) :
                         Collections.emptyList())
                 .seller(product.getSeller()!=null ? mapSallerBuyerToDTO(product.getSeller()) : null)
+                .reviews(product.getReviews()!=null ? product.getReviews().stream().map(this::mapReviewToDTO).collect(Collectors.toList()) : null)
                 .build();
     }
 
