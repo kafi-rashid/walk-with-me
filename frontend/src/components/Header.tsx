@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { logout } from '../shared/utils';
 import { UserContext } from '../store/UserContext';
 import useAxios from '../shared/axios';
+import { Input } from 'semantic-ui-react';
 
 export default function Header(): React.JSX.Element {
     const navigate = useNavigate();
@@ -11,19 +12,19 @@ export default function Header(): React.JSX.Element {
     const [categories, setCategories] = useState<any[]>([]);
     const [subCategories, setSubCategories] = useState<any>({});
     const { user, setUser } = useContext(UserContext);
-    const [cartCount, setCartCount] = useState(0); // Cart counter state
+    const [searchQuery, setSearchQuery] = useState("");
+    const [cartCount, setCartCount] = useState(0);
     const axios = useAxios();
 
     useEffect(() => {
         getCategories();
-        updateCartCount(); // Update cart count on load
+        updateCartCount();
 
         const loggedInAs = localStorage.getItem('user');
         if (loggedInAs) {
             setUser(JSON.parse(loggedInAs));
         }
 
-        // Listen for changes to localStorage or custom cart events
         const handleStorageChange = () => {
             updateCartCount();
         };
@@ -37,6 +38,12 @@ export default function Header(): React.JSX.Element {
         };
     }, []);
 
+    const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter" && searchQuery.trim()) {
+            navigate(`/search?product=${encodeURIComponent(searchQuery.trim())}`);
+        }
+    };
+
     const updateCartCount = () => {
         const cart = JSON.parse(localStorage.getItem('cart') || '[]');
         const totalItems = cart.reduce((acc: number, item: any) => acc + item.quantity, 0);
@@ -44,7 +51,6 @@ export default function Header(): React.JSX.Element {
     };
 
     const triggerCartUpdate = () => {
-        // Dispatch a custom event to notify other components of cart changes
         const event = new Event('cartUpdate');
         window.dispatchEvent(event);
     };
@@ -58,7 +64,7 @@ export default function Header(): React.JSX.Element {
             .then(({ data }) => {
                 setCategories(data);
                 data.forEach((category: any) => {
-                    getSubCategories(category.id); // Fetch subcategories for each category
+                    getSubCategories(category.id);
                 });
             })
             .catch((error: any) => {
@@ -103,7 +109,7 @@ export default function Header(): React.JSX.Element {
                                     <li 
                                         key={subCategory.id} 
                                         onClick={(e) => {
-                                            e.stopPropagation(); // Prevent parent click events
+                                            e.stopPropagation();
                                             navigate(`/categories/${category.id}/sub-categories/${subCategory.id}`);
                                         }}
                                     >
@@ -116,10 +122,18 @@ export default function Header(): React.JSX.Element {
                 </ul>
             </div>
 
+            <div className='header-search'>
+                <input type='text'
+                    placeholder="Search products by name"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    onKeyDown={handleSearch}/>
+            </div>
+
             <div className='user'>
                 <button className='cart' onClick={goToCart}>
                     <span className="material-icons">shopping_cart</span>
-                    <span className='counter'>{cartCount}</span> {/* Dynamic cart counter */}
+                    <span className='counter'>{cartCount}</span>
                 </button>
                 <p className='greetings'>Hello {user?.firstName} {user?.lastName}!</p>
                 <button onClick={toggleOptions}>
