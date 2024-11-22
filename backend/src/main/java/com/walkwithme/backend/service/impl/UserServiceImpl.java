@@ -1,6 +1,8 @@
 package com.walkwithme.backend.service.impl;
 
 import com.walkwithme.backend.dto.UserDto;
+import com.walkwithme.backend.model.Address;
+import com.walkwithme.backend.model.Role;
 import com.walkwithme.backend.model.UserEntity;
 import com.walkwithme.backend.model.UserStatus;
 import com.walkwithme.backend.repository.ReviewRepository;
@@ -68,6 +70,35 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public UserDto update(Long id, UserDto userDto) {
+        UserEntity user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
+
+        modelMapper.map(userDto, user);
+
+        if (userDto.getShippingAddress() != null) {
+            Address shippingAddress = modelMapper.map(userDto.getShippingAddress(), Address.class);
+            user.setShippingAddress(shippingAddress);
+        }
+
+        if (userDto.getBillingAddress() != null) {
+            Address billingAddress = modelMapper.map(userDto.getBillingAddress(), Address.class);
+            user.setBillingAddress(billingAddress);
+        }
+
+        if (userDto.getRoles() != null) {
+            List<Role> roles = userDto.getRoles().stream()
+                    .map(roleDto -> modelMapper.map(roleDto, Role.class))
+                    .collect(Collectors.toList());
+            user.setRoles(roles);
+        }
+
+        UserEntity updatedUser = userRepository.save(user);
+
+        return modelMapper.map(updatedUser, UserDto.class);
+    }
+
+    @Override
     public String approve(List<Long> userIds) {
         List<UserEntity> approvedUsers = new ArrayList<>();
         StringBuilder errorMessages = new StringBuilder();
@@ -127,8 +158,6 @@ public class UserServiceImpl implements UserService {
             return "Failed to delete user with ID " + id + ": " + e.getMessage();
         }
     }
-
-
 
     public String approveSeller(Long sellerId) {
         UserEntity seller = userRepository.findById(sellerId)
