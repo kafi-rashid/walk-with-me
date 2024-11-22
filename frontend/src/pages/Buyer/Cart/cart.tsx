@@ -135,11 +135,15 @@ export default function Cart(): React.JSX.Element {
             shippingAddressId: userProfile?.shippingAddress?.id || null,
             billingAddressId: userProfile?.billingAddress?.id || null,
         };
+
+        if (!payload.shippingAddressId || !payload.shippingAddressId) {
+            alert('Please go to profile and both add billing and shipping addresses')
+            return;
+        }
     
         console.log("Checkout Payload:", payload);
     
-        // Call an API or process the payload as needed
-        // axios.post('/checkout', payload)
+        // axios.post('/orders', payload)
         //     .then((response) => {
         //         console.log("Checkout successful:", response.data);
         //     })

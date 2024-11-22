@@ -118,6 +118,10 @@ export default function ProductDetails(): React.JSX.Element {
   };
 
   const handleSubmit = () => {
+    if (!userObj?.userId) {
+      alert("Couldn't fetch Seller ID, please refresh this page or try logging in again!")
+      return;
+    }
     const payload = {
       name,
       description,
