@@ -98,9 +98,8 @@ export default function Header(): React.JSX.Element {
                 </button>
 
                 <div className={`options ${showOptions ? 'show' : ''}`}>
-                    <p>Profile</p>
-                    <p>Account</p>
-                    <p onClick={handleLogout}>Log Out</p>
+                    <p onClick={ () => navigate('/profile') }>Profile</p>
+                    <p onClick={ handleLogout }>Log Out</p>
                 </div>
             </div>
         </div>

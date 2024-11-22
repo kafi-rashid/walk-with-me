@@ -18,6 +18,7 @@ import Buyers from "../pages/Admin/Users/buyers";
 import PendingSellers from "../pages/Admin/Users/pending-sellers";
 import ProductDetails from "../pages/Seller/Product/product";
 import Cart from "../pages/Buyer/Cart/cart";
+import Profile from "../pages/Buyer/Profile/profile";
 
 export const AuthRoutes: React.FC = () => {
     return (
@@ -25,6 +26,7 @@ export const AuthRoutes: React.FC = () => {
             <Route path="/" element={ <Home/> }/>
             <Route path="/products" element={ <Products/> }/>
             <Route path="/products/:id" element={ <Product/> }/>
+            <Route path="/profile" element={ <Profile/> }/>
             <Route path="/cart" element={ <Cart/> }/>
         </Routes>
     );

@@ -9,7 +9,8 @@ import {
     Table,
     Button,
     Icon,
-    TableFooter
+    TableFooter,
+    Input
 } from 'semantic-ui-react';
 
 export default function Cart(): React.JSX.Element {
@@ -70,7 +71,7 @@ export default function Cart(): React.JSX.Element {
                     <p className="page-title">Cart</p>
                     <Divider />
 
-                    <div>
+                    <div className='pb-3'>
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -162,13 +163,69 @@ export default function Cart(): React.JSX.Element {
                                 Billing Address
                             </p>
                             <Divider/>
+                            <div>
+                                <table>
+                                    <tr>
+                                        <td>Street Address</td>
+                                        <td>: aaa</td>
+                                    </tr>
+                                    <tr>
+                                        <td>City</td>
+                                        <td>: aaa</td>
+                                    </tr>
+                                    <tr>
+                                        <td>State</td>
+                                        <td>: aaa</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Zip</td>
+                                        <td>: aaa</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Country</td>
+                                        <td>: aaa</td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
                         <div className='d-flex flex-direction-column ml-4' style={{ flex: 1 }}>
                             <p className='page-title'>
                                 Shipping Address
                             </p>
                             <Divider/>
+                            <div>
+                                <table>
+                                    <tr>
+                                        <td>Street Address</td>
+                                        <td>: aaa</td>
+                                    </tr>
+                                    <tr>
+                                        <td>City</td>
+                                        <td>: aaa</td>
+                                    </tr>
+                                    <tr>
+                                        <td>State</td>
+                                        <td>: aaa</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Zip</td>
+                                        <td>: aaa</td>
+                                    </tr>
+                                    <tr>
+                                        <td>Country</td>
+                                        <td>: aaa</td>
+                                    </tr>
+                                </table>
+                            </div>
                         </div>
+                    </div>
+
+                    <div>
+                        <Divider/>
+                        <Button primary
+                            floated='right'>
+                            Check Out
+                        </Button>
                     </div>
 
                 </div>
