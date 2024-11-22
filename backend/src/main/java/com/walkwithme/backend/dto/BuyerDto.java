@@ -7,6 +7,6 @@ import lombok.Data;
 @Builder
 public class BuyerDto {
     private Long buyerId;
-    private String fristName;
+    private String firstName;
     private String lastName;
 }

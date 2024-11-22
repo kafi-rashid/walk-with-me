@@ -137,7 +137,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductListDto> getTopSellingProducts() {
-        return productRepository.findAll(PageRequest.of(0, 6, Sort.by(Sort.Direction.ASC, "id")))
+        return productRepository.findAll(PageRequest.of(0, 4, Sort.by(Sort.Direction.ASC, "id")))
                 .stream()
                 .map(this::mapToListDTO)
                 .toList();
@@ -145,7 +145,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public List<ProductListDto> getNewArrivalProducts() {
-        return productRepository.findAll(PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "id")))
+        return productRepository.findAll(PageRequest.of(0, 6, Sort.by(Sort.Direction.DESC, "id")))
                 .stream()
                 .map(this::mapToListDTO)
                 .toList();
@@ -440,7 +440,7 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
     private SellerBuyerDto mapSallerBuyerToDTO(UserEntity user) {
         return SellerBuyerDto.builder()
                 .id(user.getId())
-                .fristName(user.getFirstName())
+                .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .build();
     }

@@ -31,9 +31,6 @@ export default function SellerHome(): React.JSX.Element {
                     <li>
                         <NavLink to='/seller/profile'>Profile</NavLink>
                     </li>
-                    <li>
-                        <NavLink to='/seller/account'>Account</NavLink>
-                    </li>
                     <li onClick={ handleLogout }>Log Out</li>
                 </ul>
             </div>
