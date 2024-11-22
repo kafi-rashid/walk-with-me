@@ -19,4 +19,5 @@ public class ProductDTO {
     private Long discountId;
     private Long selleId;
     private List<ProductVariantDTO> variants;
+    private List<ReviewDto> reviewDtos;
 }

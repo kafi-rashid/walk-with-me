@@ -5,8 +5,8 @@ import lombok.Data;
 
 @Data
 @Builder
-public class SellerDto {
-    private Long sellerId;
+public class BuyerDto {
+    private Long buyerId;
     private String fristName;
     private String lastName;
 }

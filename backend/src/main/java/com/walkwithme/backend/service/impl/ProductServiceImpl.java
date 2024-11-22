@@ -6,6 +6,8 @@ import com.walkwithme.backend.model.*;
 import com.walkwithme.backend.repository.*;
 import com.walkwithme.backend.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
@@ -32,6 +34,8 @@ public class ProductServiceImpl implements ProductService {
 
     @Autowired
     private DiscountRepository discountRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
 
     @Override
     public ProductDTO createProduct(ProductDTO productDTO) {
@@ -101,7 +105,64 @@ public class ProductServiceImpl implements ProductService {
         }
     }
 
+    @Override
+    public ProductDTO addProductReview(Long productId, ReviewDto reviewDto) {
+        try {
+            Product product = productRepository.findById(productId)
+                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + productId));
 
+            Review review = new Review();
+            review.setComment(reviewDto.getComment());
+            review.setRating(reviewDto.getRating());
+            review.setReviewDate(reviewDto.getReviewDate());
+            review.setProduct(product);
+
+            if (reviewDto.getBuyerId() != null && reviewDto.getBuyerId() > 0) {
+                UserEntity buyer = userRepository.findById(reviewDto.getBuyerId())
+                        .orElseThrow(() -> new IllegalArgumentException("Buyer not found with id: " + reviewDto.getBuyerId()));
+                review.setBuyer(buyer);
+            }
+
+            reviewRepository.save(review);
+            product.getReviews().add(review);
+
+            Product updatedProduct = productRepository.save(product);
+
+            return mapToDTO(updatedProduct);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Error adding review: " + e.getMessage(), e);
+        }
+    }
+
+
+    @Override
+    public List<ProductListDto> getTopSellingProducts() {
+        return productRepository.findAll(PageRequest.of(0, 6, Sort.by(Sort.Direction.ASC, "id")))
+                .stream()
+                .map(this::mapToListDTO)
+                .toList();
+    }
+
+    @Override
+    public List<ProductListDto> getNewArrivalProducts() {
+        return productRepository.findAll(PageRequest.of(0, 4, Sort.by(Sort.Direction.DESC, "id")))
+                .stream()
+                .map(this::mapToListDTO)
+                .toList();
+    }
+
+    @Override
+    public List<ProductListDto> filterProducts(Long brandId) {
+//        return productRepository.findByBrandId(brandId)
+//                .stream()
+//                .map(this::mapToListDTO)
+//                .toList();
+        return productRepository.findAll()
+                .stream()
+                .filter(product -> product.getBrand().getId().equals(brandId))
+                .map(this::mapToListDTO)
+                .toList();
+    }
 
     @Override
     public ProductDTO getProductById(Long id) {
@@ -117,48 +178,6 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-//    @Override
-//    public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
-//        try {
-//            Product product = productRepository.findById(id)
-//                    .orElseThrow(() -> new IllegalArgumentException("Product not found with id: " + id));
-//
-//            product.setName(productDTO.getName());
-//            product.setDescription(productDTO.getDescription());
-//            product.setPrice(productDTO.getPrice());
-//            product.setImage(productDTO.getImage());
-//
-//            if (productDTO.getBrandId() != null) {
-//                Brand brand = brandRepository.findById(productDTO.getBrandId())
-//                        .orElseThrow(() -> new IllegalArgumentException("Brand not found"));
-//                product.setBrand(brand);
-//            }
-//
-//            if (productDTO.getParentCategoryId() != null) {
-//                System.out.println("Parent category add"+productDTO.getParentCategoryId());
-//                Category parentCategory = categoryRepository.findById(productDTO.getParentCategoryId())
-//                        .orElseThrow(() -> new IllegalArgumentException("Category not found"));
-//                product.setParentCategory(parentCategory);
-//            }
-//            if (productDTO.getChildCategoryId() != null) {
-//                System.out.println("Child category add"+productDTO.getChildCategoryId());
-//                Category childCategory = categoryRepository.findById(productDTO.getChildCategoryId())
-//                        .orElseThrow(() -> new IllegalArgumentException("Category not found"));
-//                product.setSubCategory(childCategory);
-//            }
-//
-//            if (productDTO.getDiscountId() != null) {
-//                Discount discount = discountRepository.findById(productDTO.getDiscountId())
-//                        .orElseThrow(() -> new IllegalArgumentException("Discount not found"));
-//                product.setDiscount(discount);
-//            }
-//
-//            Product updatedProduct = productRepository.save(product);
-//            return mapToDTO(updatedProduct);
-//        } catch (Exception e) {
-//            throw new IllegalArgumentException("Error updating product: " + e.getMessage());
-//        }
-//    }
 @Override
 public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
     try {
@@ -210,7 +229,7 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                 ProductVariant variant;
 
                 if (variantDTO.getId() != null) {
-                
+
                     variant = productVarientRepository.findById(variantDTO.getId())
                             .orElseThrow(() -> new IllegalArgumentException("Variant not found with ID: " + variantDTO.getId()));
                 } else {
@@ -237,7 +256,6 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
         throw new IllegalArgumentException("Error updating product: " + e.fillInStackTrace());
     }
 }
-
 
     @Override
     public void deleteProduct(Long id) {
@@ -348,6 +366,11 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                 .parentCategoryId(product.getParentCategory() != null ? product.getParentCategory().getId() : null)
                 .discountId(product.getDiscount() != null ? product.getDiscount().getId() : null)
                 .selleId(product.getSeller().getId()!=null ? product.getSeller().getId() : null)
+                .reviewDtos(product.getReviews() != null ?
+                        product.getReviews().stream()
+                                .map(this::mapReviewToDTO)
+                                .collect(Collectors.toList()) :
+                        Collections.emptyList())
                 .build();
     }
     private ProductListDto mapToListDTO(Product product) {
@@ -366,7 +389,7 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                                 .map(this::mapVariantToDTO)
                                 .collect(Collectors.toList()) :
                         Collections.emptyList())
-                .seller(product.getSeller()!=null ? mapSallerToDTO(product.getSeller()) : null)
+                .seller(product.getSeller()!=null ? mapSallerBuyerToDTO(product.getSeller()) : null)
                 .build();
     }
 
@@ -376,13 +399,14 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                 .name(brand.getName())
                 .build();
     }
-    private SellerDto mapSallerToDTO(UserEntity user) {
-        return SellerDto.builder()
-                .sellerId(user.getId())
+    private SellerBuyerDto mapSallerBuyerToDTO(UserEntity user) {
+        return SellerBuyerDto.builder()
+                .id(user.getId())
                 .fristName(user.getFirstName())
                 .lastName(user.getLastName())
                 .build();
     }
+
     private CategoryDTO mapCategoryToDTO(Category category) {
         return CategoryDTO.builder()
                 .id(category.getId())
@@ -405,5 +429,17 @@ public ProductDTO updateProduct(Long id, ProductDTO productDTO) {
                 .stockQuantity(variant.getStock())
                 .build();
     }
+    private ReviewDto mapReviewToDTO(Review review) {
+        return ReviewDto.builder()
+                .id(review.getId())
+                .comment(review.getComment())
+                .rating(review.getRating())
+                .reviewDate(review.getReviewDate())
+                .productId(review.getProduct() != null ? review.getProduct().getId() : null)
+                .buyerId(review.getBuyer() != null ? review.getBuyer().getId() : null)
+                .buyer(review.getBuyer() != null ? mapSallerBuyerToDTO(review.getBuyer()) : null)
+                .build();
+    }
+
 
 }
