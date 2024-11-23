@@ -121,6 +121,7 @@ export default function Cart(): React.JSX.Element {
     
             return {
                 productId: item.product.id,
+                sellerId: item.product.seller.id,
                 productName: item.product.name,
                 quantity: item.quantity,
                 price: price,
@@ -128,31 +129,48 @@ export default function Cart(): React.JSX.Element {
             };
         });
     
-        const payload = {
+        const groupedItemsBySeller = items.reduce((acc, item) => {
+            if (!acc[item.sellerId]) {
+                acc[item.sellerId] = [];
+            }
+            acc[item.sellerId].push(item);
+            return acc;
+        }, {} as { [sellerId: string]: typeof items });
+    
+        const payloads = Object.keys(groupedItemsBySeller).map((sellerId) => ({
+            sellerId,
             userId: userObj?.userId,
-            items: items,
-            totalAmount: calculateGrandTotal(),
+            items: groupedItemsBySeller[sellerId],
+            totalAmount: groupedItemsBySeller[sellerId].reduce(
+                (total, item) => total + item.price * item.quantity,
+                0
+            ),
             shippingAddressId: userProfile?.shippingAddress?.id || null,
             billingAddressId: userProfile?.billingAddress?.id || null,
-        };
-
-        if (!payload.shippingAddressId || !payload.shippingAddressId) {
-            alert('Please go to profile and both add billing and shipping addresses')
+        }));
+    
+        if (
+            payloads.some(
+                (payload) => !payload.shippingAddressId || !payload.billingAddressId
+            )
+        ) {
+            alert('Please go to profile and add both billing and shipping addresses');
             return;
         }
     
-        console.log("Checkout Payload:", payload);
+        console.log("Checkout Payloads:", payloads);
     
-        // axios.post('/orders', payload)
-        //     .then((response) => {
-        //         console.log("Checkout successful:", response.data);
-        //     })
-        //     .catch((error) => {
-        //         console.error("Checkout error:", error);
-        //     });
+        payloads.forEach((payload) => {
+            axios.post('/orders', payload)
+                .then((response) => {
+                    console.log("Checkout successful for seller:", response.data);
+                })
+                .catch((error) => {
+                    console.error("Checkout error:", error);
+                });
+        });
     };
-    
-
+  
     return (
         <div className="page product">
             <div className="page-inner">

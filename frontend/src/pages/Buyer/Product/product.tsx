@@ -137,6 +137,13 @@ export default function Product(): React.JSX.Element {
         return <p>Product not found.</p>;
     }
 
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        const options = { day: "2-digit", month: "short", year: "numeric" };
+        const formattedDate = date.toLocaleDateString("en-GB", options).replace(',', '');        
+        return formattedDate;
+    }
+
     return (
         <div className="page product">
             <div className="page-inner">
@@ -209,7 +216,7 @@ export default function Product(): React.JSX.Element {
                                         {
                                             review.reviewDate &&
                                             <span style={{ color: 'gray' }}>
-                                                &nbsp;on { review.reviewDate }
+                                                &nbsp;on { formatDate(review.reviewDate) }
                                             </span>
                                         }
                                     </p>

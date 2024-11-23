@@ -2,8 +2,6 @@ import * as React from 'react';
 import '../Home/home.scss';
 import './category.scss';
 import { useNavigate, useParams } from 'react-router-dom';
-import { UserContext } from '../../../store/UserContext';
-
 import useAxios from '../../../shared/axios';
 import Product from '../../../components/Product';
 const API_URL = import.meta.env.VITE_API_URL;
@@ -13,7 +11,7 @@ export default function Category(): React.JSX.Element {
     const [products, setProducts] = React.useState([]);
     const [category, setCategory] = React.useState({ id: null, name: '', parentId: null });
     const axios = useAxios();
-    const { cat, sub } = useParams(); // Extract category or subcategory ID
+    const { cat, sub } = useParams(); 
 
     React.useEffect(() => {
         getCategoryDetails();
@@ -21,7 +19,7 @@ export default function Category(): React.JSX.Element {
     }, [cat, sub]);
 
     const getCategoryDetails = () => {
-        const categoryId = sub || cat; // Prioritize subcategory ID if it exists
+        const categoryId = sub || cat;
         axios.get(`${API_URL}/categories/${categoryId}`)
             .then(({ data }) => {
                 setCategory(data);
@@ -32,7 +30,13 @@ export default function Category(): React.JSX.Element {
     };
 
     const getProducts = () => {
-        axios.get(`${API_URL}/products/new-arrival`)
+        let path = '/products/new-arrival';
+        if (sub) {
+            path = `/products/filter?childCategoryId=${sub}`;
+        } else if (cat) {
+            path = `/products/filter?parentCategoryId=${cat}`;
+        }
+        axios.get(`${API_URL}${path}`)
             .then(({ data }) => {
                 setProducts(data);
             })
@@ -40,6 +44,7 @@ export default function Category(): React.JSX.Element {
                 console.log(error);
             });
     };
+    
 
     return (
         <div className='container home category-page'>
@@ -52,10 +57,12 @@ export default function Category(): React.JSX.Element {
                     </div>
                     <div className='content'>
                         <div className='new-arrival-items'>
-                            {products?.length > 0 &&
+                            {
+                                products?.length > 0 &&
                                 products.map((product: any) => (
                                     <Product key={product.id} product={product} />
-                                ))}
+                                ))
+                            }
                         </div>
                     </div>
                 </div>

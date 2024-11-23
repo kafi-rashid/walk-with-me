@@ -5,8 +5,11 @@ $hero-text-color: #fff;
     min-height: 100vh;
     overflow: hidden;
     // background-color: #e4e7db;
+    // background-image: 
+    //     linear-gradient(#c89a6971, #ebd8c746),
+    //     url(../../assets/images/home-banner.jpg);
     background-image: 
-        linear-gradient(#c89a6971, #ebd8c746),
+        linear-gradient(#9e5f1d71, #452911db),
         url(../../assets/images/home-banner.jpg);
     background-size: cover; 
     background-position: center 100%;
@@ -48,7 +51,7 @@ $hero-text-color: #fff;
 .home .banner .hero {
     width: calc(100vw - 40px);
     height: calc(100vh - 140px);
-    background-color: #1a1a192f;
+    background-color: #1a1a1944;
     backdrop-filter: blur(10px);
     border-radius: 15px;
     overflow: hidden;
