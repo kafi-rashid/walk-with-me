@@ -51,9 +51,6 @@ export default function AdminHome(): React.JSX.Element {
                     </ul>
                 </div>
                 <ul>
-                    <li>
-                        <NavLink to='/admin/profile'>Profile</NavLink>
-                    </li>
                     <li onClick={ handleLogout }>Log Out</li>
                 </ul>
             </div>
