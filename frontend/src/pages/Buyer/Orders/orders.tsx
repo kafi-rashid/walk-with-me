@@ -50,7 +50,7 @@ export default function OrderHistory(): React.JSX.Element {
     }, [userObj]);
 
     const getOrderHistory = () => {
-        axios.get(`/orders?userId=${userObj?.userId}`)
+        axios.get(`/orders/by-user?userId=${userObj?.userId}`)
             .then(({ data }) => {
                 setOrders(data);
             })
@@ -69,11 +69,11 @@ export default function OrderHistory(): React.JSX.Element {
                         <Table singleLine>
                             <TableHeader>
                                 <TableRow>
-                                    <TableHeaderCell>Order ID</TableHeaderCell>
-                                    <TableHeaderCell>Date</TableHeaderCell>
-                                    <TableHeaderCell>Total Amount</TableHeaderCell>
+                                    <TableHeaderCell style={{ width: '100px' }}>Order ID</TableHeaderCell>
+                                    <TableHeaderCell style={{ width: '140px' }}>Date</TableHeaderCell>
+                                    <TableHeaderCell style={{ width: '190px' }}>Total Amount</TableHeaderCell>
                                     <TableHeaderCell>Status</TableHeaderCell>
-                                    <TableHeaderCell>Details</TableHeaderCell>
+                                    <TableHeaderCell style={{ width: '100px' }}>Details</TableHeaderCell>
                                 </TableRow>
                             </TableHeader>
                             <TableBody>
