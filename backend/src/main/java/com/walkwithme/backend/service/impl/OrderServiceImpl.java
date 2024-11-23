@@ -20,6 +20,8 @@ public class OrderServiceImpl implements OrderService {
     private ProductVarientRepository productVarientRepository;
 
     @Autowired
+    private AddressRepository addressRepository;
+    @Autowired
     private OrderItemRepository orderItemRepository;
 
     @Autowired
@@ -32,17 +34,38 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO createOrder(OrderDTO orderDTO) {
         UserEntity user = userRepository.findById(orderDTO.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + orderDTO.getUserId()));
+        UserEntity seller = new UserEntity();
+        Address billingAddress = new Address();
+        Address shippingAddress = new Address();
+        Order order = new Order();
+        if (orderDTO.getSellerId()!=null)
+        {
+             seller = userRepository.findById(orderDTO.getSellerId())
+                    .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + orderDTO.getSellerId()));
+        }
+        if (orderDTO.getShippingAddressId()!=null)
+        {
+            billingAddress = addressRepository.findById(orderDTO.getBillingAddressId())
+                    .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + orderDTO.getSellerId()));
+
+        }
+        if (orderDTO.getShippingAddressId()!=null)
+        {
+            shippingAddress = addressRepository.findById(orderDTO.getShippingAddressId())
+                    .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + orderDTO.getSellerId()));
+
+        }
 if(user.getRoles().contains("seller"))
 {
     throw new IllegalArgumentException("You cannot order a product as seller");
 }
-        Order order = new Order();
+
         order.setUser(user);
+        order.setSeller(seller);
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(orderDTO.getTotalAmount());
-//        order.setShippingAddress(orderDTO.getShippingAddress());
-//        order.setBillingAddress(orderDTO.getBillingAddress());
-
+        order.setShippingAddress(shippingAddress);
+        order.setBillingAddress(billingAddress);
         Order savedOrder = orderRepository.save(order);
 
         List<OrderItem> orderItems = orderDTO.getItems().stream().map(itemDTO -> {
