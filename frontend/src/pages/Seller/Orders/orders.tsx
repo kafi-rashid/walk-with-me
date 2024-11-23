@@ -13,6 +13,7 @@ import {
   Menu,
   MenuItem,
   Button,
+  Dropdown,
 } from 'semantic-ui-react';
 import useAxios from '../../../shared/axios';
 import { useEffect, useState } from 'react';
@@ -30,12 +31,22 @@ interface Order {
   id: number;
   userId: number;
   sellerId: number;
+  buyerName: string;
+  sellerName: string;
   items: OrderItem[];
   status: string;
   totalAmount: number;
   shippingAddressId: number;
   billingAddressId: number;
 }
+
+const statusOptions = [
+  { key: 'pending', text: 'PENDING', value: 'PENDING' },
+  { key: 'shipped', text: 'SHIPPED', value: 'SHIPPED' },
+  { key: 'on_the_way', text: 'ON_THE_WAY', value: 'ON_THE_WAY' },
+  { key: 'delivered', text: 'DELIVERED', value: 'DELIVERED' },
+  { key: 'cancelled', text: 'CANCELLED', value: 'CANCELLED' },
+];
 
 export default function Orders(): React.JSX.Element {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -54,6 +65,21 @@ export default function Orders(): React.JSX.Element {
       })
       .catch((error) => {
         console.log('Error fetching orders', error);
+      });
+  };
+
+  const handleStatusChange = (orderId: number, newStatus: string) => {
+    axios
+      .patch(`/orders/${orderId}/status?status=` + newStatus)
+      .then(() => {
+        setOrders((prevOrders) =>
+          prevOrders.map((order) =>
+            order.id === orderId ? { ...order, status: newStatus } : order
+          )
+        );
+      })
+      .catch((error) => {
+        console.log('Error updating status', error);
       });
   };
 
@@ -81,7 +107,16 @@ export default function Orders(): React.JSX.Element {
                 <TableCell>{order.buyerName}</TableCell>
                 <TableCell>{order.sellerName}</TableCell>
                 <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
-                <TableCell>{order.status}</TableCell>
+                <TableCell>
+                  <Dropdown
+                    options={statusOptions}
+                    value={order.status}
+                    onChange={(e, { value }) =>
+                      handleStatusChange(order.id, value as string)
+                    }
+                    selection
+                  />
+                </TableCell>
                 <TableCell>
                   <NavLink to={`/seller/orders/${order.id}`}>View Details</NavLink>
                 </TableCell>

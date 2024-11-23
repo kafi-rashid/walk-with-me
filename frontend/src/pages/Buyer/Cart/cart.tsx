@@ -163,6 +163,7 @@ export default function Cart(): React.JSX.Element {
         payloads.forEach((payload) => {
             axios.post('/orders', payload)
                 .then((response) => {
+                    alert("Order has been placed!")
                     console.log("Checkout successful for seller:", response.data);
                 })
                 .catch((error) => {
