@@ -22,6 +22,7 @@ import Profile from "../pages/Buyer/Profile/profile";
 import Category from "../pages/Buyer/Category/category";
 import Search from "../pages/Buyer/Search/search";
 import OrderHistory from "../pages/Buyer/Orders/orders";
+import Order from "../pages/Seller/Order/order";
 
 export const AuthRoutes: React.FC = () => {
     return (
@@ -73,6 +74,7 @@ export const SellerRoutes: React.FC = () => {
                 <Route path="products/:id" element={ <ProductDetails/> } />
                 <Route path="products/add" element={ <ProductDetails/> } />
                 <Route path="orders" element={ <Orders/> } />
+                <Route path="orders/:id" element={ <Order/> }/>
             </Route>
         </Routes>
     );

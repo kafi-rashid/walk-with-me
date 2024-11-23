@@ -62,12 +62,12 @@ export default function Orders(): React.JSX.Element {
       <p className="page-title">Order List</p>
       <Divider />
       <div className="page-content">
-        <Table compact>
+        <Table>
           <TableHeader>
             <TableRow>
               <TableHeaderCell style={{ width: '50px' }}>ID</TableHeaderCell>
-              <TableHeaderCell>User ID</TableHeaderCell>
-              <TableHeaderCell>Seller ID</TableHeaderCell>
+              <TableHeaderCell>Customer</TableHeaderCell>
+              <TableHeaderCell>Seller</TableHeaderCell>
               <TableHeaderCell>Total Amount</TableHeaderCell>
               <TableHeaderCell>Status</TableHeaderCell>
               <TableHeaderCell>Details</TableHeaderCell>
@@ -78,12 +78,12 @@ export default function Orders(): React.JSX.Element {
             {orders.map((order) => (
               <TableRow key={order.id}>
                 <TableCell>{order.id}</TableCell>
-                <TableCell>{order.userId}</TableCell>
-                <TableCell>{order.sellerId}</TableCell>
+                <TableCell>{order.buyerName}</TableCell>
+                <TableCell>{order.sellerName}</TableCell>
                 <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
                 <TableCell>{order.status}</TableCell>
                 <TableCell>
-                  <NavLink to={`/orders/${order.id}`}>View Details</NavLink>
+                  <NavLink to={`/seller/orders/${order.id}`}>View Details</NavLink>
                 </TableCell>
               </TableRow>
             ))}
