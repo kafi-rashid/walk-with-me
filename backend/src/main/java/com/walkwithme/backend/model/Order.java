@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -40,4 +41,5 @@ public class Order {
     @ManyToOne
     @JoinColumn(name = "billing_address_id", nullable = true)
     private Address billingAddress;
+    private LocalDateTime orderDate;
 }

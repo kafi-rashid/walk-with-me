@@ -1,5 +1,6 @@
 package com.walkwithme.backend.service.impl;
 
+import com.walkwithme.backend.dto.AddressDtoBuilder;
 import com.walkwithme.backend.dto.OrderDTO;
 import com.walkwithme.backend.dto.OrderItemDTO;
 import com.walkwithme.backend.model.*;
@@ -8,6 +9,7 @@ import com.walkwithme.backend.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -65,12 +67,16 @@ public class OrderServiceImpl implements OrderService {
         order.setTotalAmount(orderDTO.getTotalAmount());
         order.setBillingAddress(billingAddress);
         order.setShippingAddress(shippingAddress);
+        order.setOrderDate(LocalDateTime.now());
 
         Order savedOrder = orderRepository.save(order);
 
         List<OrderItem> orderItems = orderDTO.getItems().stream().map(itemDTO -> {
             Product product = productRepository.findById(itemDTO.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + itemDTO.getProductId()));
+
+            // Nullify the image property to prevent its usage
+            product.setImage(null);
 
             OrderItem item = new OrderItem();
             item.setOrder(savedOrder);
@@ -83,6 +89,7 @@ public class OrderServiceImpl implements OrderService {
             item.setPrice(itemDTO.getPrice());
             return item;
         }).collect(Collectors.toList());
+
 
         orderItemRepository.saveAll(orderItems);
 
@@ -98,11 +105,16 @@ public class OrderServiceImpl implements OrderService {
         return mapToDTO(order);
     }
 
-    @Override
-    public List<OrderDTO> getAllOrders() {
-        List<Order> orders = orderRepository.findAll();
-        return orders.stream().map(this::mapToDTO).collect(Collectors.toList());
-    }
+//    @Override
+//    public List<OrderDTO> getAllOrders() {
+//        List<Order> orders = orderRepository.findAll();
+//        return orders.stream().map(this::mapToDTO).collect(Collectors.toList());
+//    }
+@Override
+public List<OrderDTO> getAllOrders() {
+    List<Order> orders = orderRepository.findAll();
+    return orders.stream().map(this::mapToDTO).collect(Collectors.toList());
+}
 
     @Override
     public List<OrderDTO> getAllOrdersByUser(Long userId) {
@@ -192,36 +204,47 @@ public class OrderServiceImpl implements OrderService {
         orderRepository.save(order);
         return "Order with ID: " + orderId + " has been successfully cancelled by the buyer.";
     }
-
     private OrderItemDTO mapOrderItemToDTO(OrderItem orderItem) {
         return OrderItemDTO.builder()
                 .id(orderItem.getId())
                 .productId(orderItem.getProduct().getId())
                 .productName(orderItem.getProduct().getName())
+                .variantId(orderItem.getVariant() != null ? orderItem.getVariant().getId() : null)
                 .quantity(orderItem.getQuantity())
                 .price(orderItem.getPrice())
                 .build();
     }
-
     private OrderDTO mapToDTO(Order order) {
         List<OrderItemDTO> itemDTOs = order.getItems().stream()
-                .map(item -> OrderItemDTO.builder()
-                        .id(item.getId())
-                        .productId(item.getProduct().getId())
-                        .variantId(item.getVariant() != null ? item.getVariant().getId() : null)
-                        .quantity(item.getQuantity())
-                        .price(item.getPrice())
-                        .build())
+                .map(this::mapOrderItemToDTO)
                 .collect(Collectors.toList());
 
         return OrderDTO.builder()
                 .id(order.getId())
                 .userId(order.getUser().getId())
+                .sellerId(order.getSeller() != null ? order.getSeller().getId() : null)
                 .items(itemDTOs)
                 .status(order.getStatus())
                 .totalAmount(order.getTotalAmount())
-//                .shippingAddress(order.getShippingAddress())
-//                .billingAddress(order.getBillingAddress())
+                .shippingAddressId(order.getShippingAddress() != null ? order.getShippingAddress().getId() : null)
+                .billingAddressId(order.getBillingAddress() != null ? order.getBillingAddress().getId() : null)
+                .buyerName(order.getUser().getFirstName() + " " + order.getUser().getLastName())
+                .sellerName(order.getSeller() != null ? order.getSeller().getFirstName() + " " + order.getSeller().getLastName() : null)
+                .shippingAddress(mapAddressToDTO(order.getShippingAddress()))
+                .billingAddress(mapAddressToDTO(order.getBillingAddress()))
                 .build();
     }
+
+    private AddressDtoBuilder mapAddressToDTO(Address address) {
+        if (address == null) return null;
+        return AddressDtoBuilder.builder()
+                .id(address.getId())
+                .street(address.getStreet())
+                .city(address.getCity())
+                .state(address.getState())
+                .postalCode(address.getPostalCode())
+                .country(address.getCountry())
+                .build();
+    }
+
 }

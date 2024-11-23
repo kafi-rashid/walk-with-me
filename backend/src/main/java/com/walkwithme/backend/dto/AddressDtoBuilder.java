@@ -1,9 +1,11 @@
 package com.walkwithme.backend.dto;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
-public class AddressDto {
+@Builder
+public class AddressDtoBuilder {
     private Long id;
     private String street;
     private String city;
@@ -11,3 +13,4 @@ public class AddressDto {
     private String postalCode;
     private String country;
 }
+

@@ -16,5 +16,9 @@ public class OrderDTO {
     private Double totalAmount;
     private Long shippingAddressId;
     private Long billingAddressId;
+    private  String buyerName;
+    private  String sellerName;
+    private AddressDtoBuilder shippingAddress;
+    private AddressDtoBuilder billingAddress;
 }
 

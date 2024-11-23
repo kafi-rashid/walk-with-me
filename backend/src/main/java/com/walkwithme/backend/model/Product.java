@@ -21,6 +21,7 @@ public class Product {
     private Double price;
 
     @Lob
+    @Basic(fetch = FetchType.LAZY)
     @Column(columnDefinition = "TEXT")
     private String image;
     @Column(nullable = true)
