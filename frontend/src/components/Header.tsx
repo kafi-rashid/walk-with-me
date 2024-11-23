@@ -136,14 +136,15 @@ export default function Header(): React.JSX.Element {
                             <span className="material-icons">shopping_cart</span>
                             <span className='counter'>{cartCount}</span>
                         </button>
-                        <p className='greetings'>Hello {user?.firstName} {user?.lastName}!</p>
-                        <button onClick={toggleOptions}>
-                            <span className="material-icons">
+                        <div className='d-flex' onClick={toggleOptions}>
+                            <p className='greetings'>Hello {user?.firstName} {user?.lastName}!</p>
+                            <span className="material-icons ml-2">
                                 {showOptions ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
                             </span>
-                        </button>
+                        </div>
 
                         <div className={`options ${showOptions ? 'show' : ''}`}>
+                            <p onClick={() => navigate('/orders')}>Order History</p>
                             <p onClick={() => navigate('/profile')}>Profile</p>
                             <p onClick={handleLogout}>Log Out</p>
                         </div>
