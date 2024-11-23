@@ -21,6 +21,7 @@ import Cart from "../pages/Buyer/Cart/cart";
 import Profile from "../pages/Buyer/Profile/profile";
 import Category from "../pages/Buyer/Category/category";
 import Search from "../pages/Buyer/Search/search";
+import OrderHistory from "../pages/Buyer/Orders/orders";
 
 export const AuthRoutes: React.FC = () => {
     return (
@@ -33,6 +34,7 @@ export const AuthRoutes: React.FC = () => {
             <Route path="/profile" element={ <Profile/> }/>
             <Route path="/search" element={ <Search/> }/>
             <Route path="/cart" element={ <Cart/> }/>
+            <Route path="/orders" element={ <OrderHistory/> }/>
         </Routes>
     );
 };

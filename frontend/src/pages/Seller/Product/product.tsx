@@ -15,9 +15,9 @@ import {
   Form,
   TextArea,
   Image,
+  Confirm,
 } from 'semantic-ui-react';
 import useAxios from '../../../shared/axios';
-import { UserContext } from '../../../store/UserContext';
 
 export default function ProductDetails(): React.JSX.Element {
   const { id: productId } = useParams<{ id: string }>(); // Get `id` from URL params
@@ -34,8 +34,9 @@ export default function ProductDetails(): React.JSX.Element {
   const [categories, setCategories] = React.useState([]);
   const [subcategories, setSubcategories] = React.useState([]);
   const [userObj, setUserObj] = React.useState({});
-  const navigate = useNavigate();
+  const [confirmOpen, setConfirmOpen] = React.useState(false);
 
+  const navigate = useNavigate();
   const axios = useAxios();
 
   React.useEffect(() => {
@@ -43,7 +44,7 @@ export default function ProductDetails(): React.JSX.Element {
     if (user) {
       setUserObj(JSON.parse(user));
     }
-  }, [])
+  }, []);
 
   React.useEffect(() => {
     getBrands();
@@ -84,7 +85,7 @@ export default function ProductDetails(): React.JSX.Element {
         setParentCategoryId(data.parentCategory?.id || null);
         setChildCategoryId(data.childCategory?.id || null);
         setVariants(data.variants || []);
-  
+
         if (data.parentCategory?.id) {
           getSubCategories(data.parentCategory.id);
         }
@@ -92,7 +93,6 @@ export default function ProductDetails(): React.JSX.Element {
       .catch((error) => console.error('Error fetching product details:', error))
       .finally(() => setLoading(false));
   };
-  
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -117,9 +117,23 @@ export default function ProductDetails(): React.JSX.Element {
     setVariants(variants.filter((_, i) => i !== index));
   };
 
+  const handleDelete = () => {
+    if (!productId) return;
+
+    axios.delete(`/products/${productId}`)
+      .then(() => {
+        alert('Product deleted successfully!');
+        navigate('/seller/products');
+      })
+      .catch((error) => {
+        console.error('Error deleting product:', error);
+        alert('Can not delete this product as this item is already in order history.');
+      });
+  };
+
   const handleSubmit = () => {
     if (!userObj?.userId) {
-      alert("Couldn't fetch Seller ID, please refresh this page or try logging in again!")
+      alert("Couldn't fetch Seller ID, please refresh this page or try logging in again!");
       return;
     }
     const payload = {
@@ -131,27 +145,23 @@ export default function ProductDetails(): React.JSX.Element {
       parentCategoryId,
       childCategoryId,
       variants,
-      sellerId: userObj?.userId ?? null
+      sellerId: userObj?.userId ?? null,
     };
 
     if (productId) {
       axios.put(`/products/${productId}`, payload)
-        .then(({ data }) => {
-          alert("Product has been updated!");
+        .then(() => {
+          alert('Product has been updated!');
           navigate('/seller/products');
         })
-        .catch((error) => {
-          console.log('Error updating product:', error);
-        });
+        .catch((error) => console.error('Error updating product:', error));
     } else {
       axios.post('/products', payload)
-        .then(({ data }) => {
-          alert("Product has been added!");
+        .then(() => {
+          alert('Product has been added!');
           navigate('/seller/products');
         })
-        .catch((error) => {
-          console.log('Error adding product:', error);
-        });
+        .catch((error) => console.error('Error adding product:', error));
     }
   };
 
@@ -183,9 +193,7 @@ export default function ProductDetails(): React.JSX.Element {
         <Form.Field>
           <label>Image</label>
           <Input type="file" onChange={handleImageUpload} />
-          {/* {image && <p>Image uploaded successfully</p>} */}
-          <Image className='mt-3' src={ image } size='small' />
-
+          <Image className="mt-3" src={image} size="small" />
         </Form.Field>
 
         <Form.Field>
@@ -259,21 +267,36 @@ export default function ProductDetails(): React.JSX.Element {
                     type="number"
                     value={variant.stockQuantity}
                     onChange={(e) => updateVariant(index, 'stockQuantity', Number(e.target.value))}
-                    placeholder="Enter stock"
+                    placeholder="Enter stock quantity"
                   />
                 </TableCell>
                 <TableCell>
-                  <Button icon="trash" color="red" onClick={() => removeVariant(index)} />
+                  <Icon name="trash" color="red" onClick={() => removeVariant(index)} />
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-        <Button secondary icon labelPosition="left" onClick={addVariant}>
-          <Icon name="add" /> Add Variant
+        <Button onClick={addVariant} color="green" icon labelPosition="left">
+          <Icon name="plus" />
+          Add Variant
         </Button>
 
         <Divider />
+
+        {productId && (
+          <>
+            <Button color="red" className="mr-3" onClick={() => setConfirmOpen(true)}>
+              Delete Product
+            </Button>
+            <Confirm
+              open={confirmOpen}
+              onCancel={() => setConfirmOpen(false)}
+              onConfirm={handleDelete}
+              content="Are you sure you want to delete this product?"
+            />
+          </>
+        )}
 
         <Button primary onClick={handleSubmit}>
           {productId ? 'Update Product' : 'Add Product'}

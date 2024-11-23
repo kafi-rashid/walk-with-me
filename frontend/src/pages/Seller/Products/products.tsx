@@ -34,24 +34,32 @@ export default function Products(): React.JSX.Element {
   const [userObj, setUserObj] = React.useState('');
   const [userProfile, setUserProfile] = React.useState<any>({});
   const navigate = useNavigate();
-  const { user, setUser } = useContext(UserContext);
   const [canAddProduct, setCanAddProduct] = React.useState(false);
   const axios = useAxios();
 
   React.useEffect(() => {
-    axios.get('/products')
-      .then(({ data }) => {
-        setProducts(data);
-      })
-      .catch((error) => {
-        console.log("Error", error);
-      });
-
-      const user = localStorage.getItem('user');
+    const user = localStorage.getItem('user');
     if (user) {
       setUserObj(JSON.parse(user));
     }
   }, []);
+
+  React.useEffect(() => {
+    if (userObj) {
+      getProducts();
+    }
+  }, [userObj]);
+
+  const getProducts = () => {
+    axios.get('/products')
+      .then(({ data }) => {
+        const prods = data?.filter(d => d?.seller?.id === userObj?.userId);
+        setProducts(prods);
+      })
+      .catch((error) => {
+        console.log("Error", error);
+      });
+  };
 
   React.useEffect(() => {
     if (userObj) {
