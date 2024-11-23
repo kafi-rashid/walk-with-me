@@ -103,29 +103,37 @@ public class OrderServiceImpl implements OrderService {
         return mapToDTO(order);
     }
 
-//    @Override
+    //    @Override
 //    public List<OrderDTO> getAllOrders() {
 //        List<Order> orders = orderRepository.findAll();
 //        return orders.stream().map(this::mapToDTO).collect(Collectors.toList());
 //    }
-@Override
-public List<OrderDTO> getAllOrders() {
-    List<Order> orders = orderRepository.findAll();
-    return orders.stream().map(this::mapToListDTO).collect(Collectors.toList());
-}
+    @Override
+    public List<OrderDTO> getAllOrders() {
+        List<Order> orders = orderRepository.findAll();
+        return orders.stream().map(this::mapToListDTO).collect(Collectors.toList());
+    }
 
     @Override
-    public List<OrderDTO> getAllOrdersByUser(Long userId) {
+    public List<OrderDTO> getAllOrdersByUser(Long userId, Long sellerId) {
         try {
-            List<Order> orders = orderRepository.findAllOrdersByUserId(userId);
-            return orders.stream()
-                    .map(this::mapToDTO)
-                    .collect(Collectors.toList());
+            if (userId != null) {
+                List<Order> orders = orderRepository.findAllOrdersByUserId(userId);
+                return orders.stream()
+                        .map(this::mapToListDTO)
+                        .collect(Collectors.toList());
+            } else if (sellerId != null) {
+                List<Order> orders = orderRepository.findAllOrdersBySellerId(sellerId);
+                return orders.stream()
+                        .map(this::mapToListDTO)
+                        .collect(Collectors.toList());
+            }
+            return null;
+
         } catch (Exception e) {
             throw new RuntimeException("Error fetching orders for user with ID: " + userId, e);
         }
     }
-
 
     @Override
     public OrderDTO updateOrder(Long id, OrderDTO orderDTO) {
