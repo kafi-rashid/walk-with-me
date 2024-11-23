@@ -159,7 +159,7 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll()
                 .stream()
                 .filter(product -> brandId == null || product.getBrand().getId().equals(brandId))
-                .filter(product -> productName == null || product.getName().equalsIgnoreCase(productName))
+                .filter(product -> productName == null || product.getName().toLowerCase().contains(productName.toLowerCase()))
                 .filter(product -> parentCategoryId == null || product.getParentCategory().getId().equals(parentCategoryId))
                 .filter(product -> childCategoryId == null || product.getSubCategory().getId().equals(childCategoryId))
                 .filter(product -> sellerId == null || product.getSeller().getId().equals(sellerId))

@@ -10,6 +10,7 @@ import java.util.List;
 public class OrderDTO {
     private Long id;
     private Long userId;
+    private Long sellerId;
     private List<OrderItemDTO> items;
     private OrderStatus status;
     private Double totalAmount;
