@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState, useRef } from 'react';
 import './Header.scss';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../shared/utils';
@@ -13,6 +13,9 @@ export default function Header(): React.JSX.Element {
     const [searchQuery, setSearchQuery] = useState("");
     const [cartCount, setCartCount] = useState(0);
     const axios = useAxios();
+
+    // Reference for the options container
+    const optionsRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         getCategories();
@@ -30,9 +33,19 @@ export default function Header(): React.JSX.Element {
         window.addEventListener('storage', handleStorageChange);
         window.addEventListener('cartUpdate', handleStorageChange);
 
+        // Event listener for clicks outside the options dropdown
+        const handleClickOutside = (event: MouseEvent) => {
+            if (optionsRef.current && !optionsRef.current.contains(event.target as Node)) {
+                setShowOptions(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+
         return () => {
             window.removeEventListener('storage', handleStorageChange);
             window.removeEventListener('cartUpdate', handleStorageChange);
+            document.removeEventListener('mousedown', handleClickOutside);
         };
     }, []);
 
@@ -143,10 +156,22 @@ export default function Header(): React.JSX.Element {
                             </span>
                         </div>
 
-                        <div className={`options ${showOptions ? 'show' : ''}`}>
-                            <p onClick={() => navigate('/orders')}>Order History</p>
-                            <p onClick={() => navigate('/profile')}>Profile</p>
-                            <p onClick={handleLogout}>Log Out</p>
+                        <div 
+                            className={`options ${showOptions ? 'show' : ''}`} 
+                            ref={optionsRef}
+                        >
+                            <p onClick={() => {
+                                setShowOptions(false);
+                                navigate('/orders');
+                            }}>Order History</p>
+                            <p onClick={() => {
+                                setShowOptions(false);
+                                navigate('/profile');
+                            }}>Profile</p>
+                            <p onClick={() => {
+                                setShowOptions(false);
+                                handleLogout();
+                            }}>Log Out</p>
                         </div>
                     </> :
                     <p className='greetings'
