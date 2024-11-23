@@ -42,8 +42,13 @@ export default function Products(): React.JSX.Element {
     if (user) {
       setUserObj(JSON.parse(user));
     }
-    getProducts();
   }, []);
+
+  React.useEffect(() => {
+    if (userObj) {
+      getProducts();
+    }
+  }, [userObj]);
 
   const getProducts = () => {
     axios.get('/products')
@@ -54,7 +59,7 @@ export default function Products(): React.JSX.Element {
       .catch((error) => {
         console.log("Error", error);
       });
-  }
+  };
 
   React.useEffect(() => {
     if (userObj) {
