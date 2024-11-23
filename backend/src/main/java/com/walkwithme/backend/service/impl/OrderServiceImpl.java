@@ -119,7 +119,7 @@ public List<OrderDTO> getAllOrders() {
         try {
             List<Order> orders = orderRepository.findAllOrdersByUserId(userId);
             return orders.stream()
-                    .map(this::mapToDTO)
+                    .map(this::mapToListDTO)
                     .collect(Collectors.toList());
         } catch (Exception e) {
             throw new RuntimeException("Error fetching orders for user with ID: " + userId, e);

@@ -28,7 +28,8 @@ public class BrandController {
 
     @GetMapping
     public ResponseEntity<List<BrandDTO>> getAllBrands() {
-        return ResponseEntity.ok(brandService.getAllBrands());
+        return ResponseEntity.ok(null);
+//        return ResponseEntity.ok(brandService.getAllBrands());
     }
 
     @PutMapping("/{id}")
