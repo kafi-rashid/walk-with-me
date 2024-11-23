@@ -9,23 +9,34 @@ import {
     Table,
     Button,
     Icon,
-    TableFooter,
-    Input
+    TableFooter
 } from 'semantic-ui-react';
 import useAxios from '../../../shared/axios';
+import { useNavigate } from 'react-router-dom';
+
+interface OrderItem {
+    id: number;
+    productId: number;
+    productName: string | null;
+    quantity: number;
+    price: number;
+}
+
+interface Order {
+    id: number;
+    totalAmount: number;
+    status: string;
+    items: OrderItem[];
+    createdAt: string;
+}
 
 export default function OrderHistory(): React.JSX.Element {
-    const [products, setProducts] = React.useState<any[]>([]);
+    const [orders, setOrders] = React.useState<Order[]>([]);
     const axios = useAxios();
-    const [userObj, setUserObj] = React.useState('');
-    const [userProfile, setUserProfile] = React.useState({});
+    const [userObj, setUserObj] = React.useState<any>({});
+    const navigate = useNavigate();
 
     React.useEffect(() => {
-        const storedItems = localStorage.getItem('cart');
-        if (storedItems) {
-            setProducts(JSON.parse(storedItems));
-        }
-
         const user = localStorage.getItem('user');
         if (user) {
             setUserObj(JSON.parse(user));
@@ -33,31 +44,84 @@ export default function OrderHistory(): React.JSX.Element {
     }, []);
 
     React.useEffect(() => {
-        if (userObj) {
-            getUserDetails();
+        if (userObj?.userId) {
+            getOrderHistory();
         }
     }, [userObj]);
 
-    const getUserDetails = () => {
-        axios.get('/users/' + userObj?.userId)
+    const getOrderHistory = () => {
+        axios.get(`/orders?userId=${userObj?.userId}`)
             .then(({ data }) => {
-                setUserProfile(data);
+                setOrders(data);
             })
             .catch((error) => {
-                console.log(error);
+                console.error('Error fetching order history:', error);
             });
     };
-  
+
     return (
         <div className="page product">
             <div className="page-inner">
                 <div className="manage-page">
                     <p className="page-title">Order History</p>
                     <Divider />
-
-                    <div className='pb-3'>
+                    <div className="page-content">
+                        <Table singleLine>
+                            <TableHeader>
+                                <TableRow>
+                                    <TableHeaderCell>Order ID</TableHeaderCell>
+                                    <TableHeaderCell>Date</TableHeaderCell>
+                                    <TableHeaderCell>Total Amount</TableHeaderCell>
+                                    <TableHeaderCell>Status</TableHeaderCell>
+                                    <TableHeaderCell>Details</TableHeaderCell>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {orders.length > 0 ? (
+                                    orders.map(order => (
+                                        <TableRow key={order.id}>
+                                            <TableCell>{order.id}</TableCell>
+                                            <TableCell>{new Date(order.createdAt).toLocaleDateString()}</TableCell>
+                                            <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
+                                            <TableCell>{order.status}</TableCell>
+                                            <TableCell>
+                                                <Button 
+                                                    icon 
+                                                    size="small"
+                                                    primary
+                                                    onClick={() => console.log('View details for order', order.id)}
+                                                >
+                                                    <Icon name="eye" /> View
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan="5" textAlign="center">
+                                            No orders found.
+                                        </TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                            <TableFooter fullWidth>
+                                <TableRow>
+                                    <TableHeaderCell colSpan="5">
+                                        <Button
+                                            floated="right"
+                                            icon
+                                            labelPosition="left"
+                                            primary
+                                            size="small"
+                                            onClick={ () => navigate('/') }
+                                        >
+                                            <Icon name="shopping cart" /> Shop More
+                                        </Button>
+                                    </TableHeaderCell>
+                                </TableRow>
+                            </TableFooter>
+                        </Table>
                     </div>
-
                 </div>
             </div>
         </div>

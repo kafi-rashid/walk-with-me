@@ -1,99 +1,114 @@
 import * as React from 'react';
+import { NavLink } from 'react-router-dom';
 import {
   Divider,
+  Table,
   TableRow,
   TableHeaderCell,
   TableHeader,
   TableFooter,
   TableCell,
   TableBody,
-  Button,
-  Checkbox,
   Icon,
-  Table,
+  Menu,
+  MenuItem,
+  Button,
 } from 'semantic-ui-react';
+import useAxios from '../../../shared/axios';
+import { useEffect, useState } from 'react';
 
-interface User {
+interface OrderItem {
   id: number;
-  name: string;
-  registrationDate: string;
-  email: string;
-  approved: boolean;
-  selected: boolean;
+  productId: number;
+  productName: string | null;
+  variantId: number;
+  quantity: number;
+  price: number;
+}
+
+interface Order {
+  id: number;
+  userId: number;
+  sellerId: number;
+  items: OrderItem[];
+  status: string;
+  totalAmount: number;
+  shippingAddressId: number;
+  billingAddressId: number;
 }
 
 export default function Orders(): React.JSX.Element {
-  const [users, setUsers] = React.useState<User[]>([
-    { id: 1, name: 'John Lilki', registrationDate: 'September 14, 2013', email: 'jhlilk22@yahoo.com', approved: false, selected: false },
-    { id: 2, name: 'Jamie Harington', registrationDate: 'January 11, 2014', email: 'jamieharingonton@yahoo.com', approved: false, selected: false },
-    { id: 3, name: 'Jill Lewis', registrationDate: 'May 11, 2014', email: 'jilsewris22@yahoo.com', approved: false, selected: false },
-  ]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const axios = useAxios();
 
-  const approveRow = () => {
-    console.log(users);
+  useEffect(() => {
+    getOrders();
+  }, []);
+
+  const getOrders = () => {
+    axios
+      .get('/orders')
+      .then(({ data }) => {
+        setOrders(data);
+      })
+      .catch((error) => {
+        console.log('Error fetching orders', error);
+      });
   };
-
-  const toggleSelectRow = (id: number) => {
-    setUsers(users.map(user =>
-      user.id === id ? { ...user, selected: !user.selected } : user
-    ));
-  };
-
-  const isAnyRowSelected = users.some(user => user.selected && !user.approved);
 
   return (
-    <div className='manage-page'>
-      <p className='page-title'>Seller Profiles</p>
+    <div className="manage-page">
+      <p className="page-title">Order List</p>
       <Divider />
       <div className="page-content">
-        <Table compact celled definition>
+        <Table compact>
           <TableHeader>
             <TableRow>
-              <TableHeaderCell />
-              <TableHeaderCell>Name</TableHeaderCell>
-              <TableHeaderCell>E-mail address</TableHeaderCell>
-              <TableHeaderCell>Signed Up At</TableHeaderCell>
-              <TableHeaderCell>Approved</TableHeaderCell>
+              <TableHeaderCell style={{ width: '50px' }}>ID</TableHeaderCell>
+              <TableHeaderCell>User ID</TableHeaderCell>
+              <TableHeaderCell>Seller ID</TableHeaderCell>
+              <TableHeaderCell>Total Amount</TableHeaderCell>
+              <TableHeaderCell>Status</TableHeaderCell>
+              <TableHeaderCell>Details</TableHeaderCell>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {users.map(user => (
-              <TableRow key={user.id}>
-                <TableCell collapsing>
-                  <Checkbox 
-                    checked={user.selected} 
-                    onChange={() => toggleSelectRow(user.id)} 
-                  />
+            {orders.map((order) => (
+              <TableRow key={order.id}>
+                <TableCell>{order.id}</TableCell>
+                <TableCell>{order.userId}</TableCell>
+                <TableCell>{order.sellerId}</TableCell>
+                <TableCell>${order.totalAmount.toFixed(2)}</TableCell>
+                <TableCell>{order.status}</TableCell>
+                <TableCell>
+                  <NavLink to={`/orders/${order.id}`}>View Details</NavLink>
                 </TableCell>
-                <TableCell>{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>{user.registrationDate}</TableCell>
-                <TableCell>{user.approved ? 'Yes' : 'No'}</TableCell>
               </TableRow>
             ))}
           </TableBody>
 
           <TableFooter fullWidth>
             <TableRow>
-              <TableHeaderCell />
-              <TableHeaderCell colSpan='5'>
-                <Button
-                  floated='right'
-                  icon
-                  labelPosition='left'
-                  primary
-                  size='small'
-                >
-                  <Icon name='user' /> Add Seller
-                </Button>
-                <Button 
-                  size='small' 
-                  onClick={ approveRow }
-                  disabled={ !isAnyRowSelected }
-                >
-                  Approve
-                </Button>
+              <TableHeaderCell colSpan="6">
+                <Menu floated="right" pagination>
+                  <MenuItem
+                    as="a"
+                    icon
+                    onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                  >
+                    <Icon name="chevron left" />
+                  </MenuItem>
+                  <MenuItem as="a">{currentPage}</MenuItem>
+                  <MenuItem
+                    as="a"
+                    icon
+                    onClick={() => setCurrentPage((prev) => prev + 1)}
+                  >
+                    <Icon name="chevron right" />
+                  </MenuItem>
+                </Menu>
               </TableHeaderCell>
             </TableRow>
           </TableFooter>
