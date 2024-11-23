@@ -34,38 +34,38 @@ public class OrderServiceImpl implements OrderService {
     public OrderDTO createOrder(OrderDTO orderDTO) {
         UserEntity user = userRepository.findById(orderDTO.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("User not found with ID: " + orderDTO.getUserId()));
-        UserEntity seller = new UserEntity();
-        Address billingAddress = new Address();
-        Address shippingAddress = new Address();
-        Order order = new Order();
-        if (orderDTO.getSellerId()!=null)
-        {
-             seller = userRepository.findById(orderDTO.getSellerId())
+
+//        if (user.getRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("seller"))) {
+//            throw new IllegalArgumentException("You cannot order a product as a seller");
+//        }
+
+        UserEntity seller = null;
+        Address billingAddress = null;
+        Address shippingAddress = null;
+
+        if (orderDTO.getSellerId() != null) {
+            seller = userRepository.findById(orderDTO.getSellerId())
                     .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + orderDTO.getSellerId()));
         }
-        if (orderDTO.getShippingAddressId()!=null)
-        {
+
+        if (orderDTO.getBillingAddressId() != null) {
             billingAddress = addressRepository.findById(orderDTO.getBillingAddressId())
-                    .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + orderDTO.getSellerId()));
-
+                    .orElseThrow(() -> new IllegalArgumentException("Billing address not found with ID: " + orderDTO.getBillingAddressId()));
         }
-        if (orderDTO.getShippingAddressId()!=null)
-        {
+
+        if (orderDTO.getShippingAddressId() != null) {
             shippingAddress = addressRepository.findById(orderDTO.getShippingAddressId())
-                    .orElseThrow(() -> new IllegalArgumentException("Seller not found with ID: " + orderDTO.getSellerId()));
-
+                    .orElseThrow(() -> new IllegalArgumentException("Shipping address not found with ID: " + orderDTO.getShippingAddressId()));
         }
-if(user.getRoles().contains("seller"))
-{
-    throw new IllegalArgumentException("You cannot order a product as seller");
-}
 
+        Order order = new Order();
         order.setUser(user);
         order.setSeller(seller);
         order.setStatus(OrderStatus.PENDING);
         order.setTotalAmount(orderDTO.getTotalAmount());
-        order.setShippingAddress(shippingAddress);
         order.setBillingAddress(billingAddress);
+        order.setShippingAddress(shippingAddress);
+
         Order savedOrder = orderRepository.save(order);
 
         List<OrderItem> orderItems = orderDTO.getItems().stream().map(itemDTO -> {
@@ -90,7 +90,6 @@ if(user.getRoles().contains("seller"))
 
         return mapToDTO(savedOrder);
     }
-
 
     @Override
     public OrderDTO getOrderById(Long id) {
