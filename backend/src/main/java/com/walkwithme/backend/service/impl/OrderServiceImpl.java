@@ -74,9 +74,7 @@ public class OrderServiceImpl implements OrderService {
         List<OrderItem> orderItems = orderDTO.getItems().stream().map(itemDTO -> {
             Product product = productRepository.findById(itemDTO.getProductId())
                     .orElseThrow(() -> new IllegalArgumentException("Product not found with ID: " + itemDTO.getProductId()));
-
-            // Nullify the image property to prevent its usage
-            product.setImage(null);
+//            product.setImage(null);
 
             OrderItem item = new OrderItem();
             item.setOrder(savedOrder);
@@ -113,7 +111,7 @@ public class OrderServiceImpl implements OrderService {
 @Override
 public List<OrderDTO> getAllOrders() {
     List<Order> orders = orderRepository.findAll();
-    return orders.stream().map(this::mapToDTO).collect(Collectors.toList());
+    return orders.stream().map(this::mapToListDTO).collect(Collectors.toList());
 }
 
     @Override
@@ -232,6 +230,28 @@ public List<OrderDTO> getAllOrders() {
                 .sellerName(order.getSeller() != null ? order.getSeller().getFirstName() + " " + order.getSeller().getLastName() : null)
                 .shippingAddress(mapAddressToDTO(order.getShippingAddress()))
                 .billingAddress(mapAddressToDTO(order.getBillingAddress()))
+                .orderDate(order.getOrderDate())
+                .build();
+    }
+    private OrderDTO mapToListDTO(Order order) {
+//        List<OrderItemDTO> itemDTOs = order.getItems().stream()
+//                .map(this::mapOrderItemToDTO)
+//                .collect(Collectors.toList());
+
+        return OrderDTO.builder()
+                .id(order.getId())
+                .userId(order.getUser().getId())
+                .sellerId(order.getSeller() != null ? order.getSeller().getId() : null)
+//                .items(itemDTOs)
+                .status(order.getStatus())
+                .totalAmount(order.getTotalAmount())
+                .shippingAddressId(order.getShippingAddress() != null ? order.getShippingAddress().getId() : null)
+                .billingAddressId(order.getBillingAddress() != null ? order.getBillingAddress().getId() : null)
+                .buyerName(order.getUser().getFirstName() + " " + order.getUser().getLastName())
+                .sellerName(order.getSeller() != null ? order.getSeller().getFirstName() + " " + order.getSeller().getLastName() : null)
+                .shippingAddress(mapAddressToDTO(order.getShippingAddress()))
+                .billingAddress(mapAddressToDTO(order.getBillingAddress()))
+                .orderDate(order.getOrderDate())
                 .build();
     }
 

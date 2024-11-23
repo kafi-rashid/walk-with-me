@@ -3,6 +3,7 @@ import com.walkwithme.backend.model.OrderStatus;
 import lombok.Builder;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -18,6 +19,7 @@ public class OrderDTO {
     private Long billingAddressId;
     private  String buyerName;
     private  String sellerName;
+    private LocalDateTime orderDate;
     private AddressDtoBuilder shippingAddress;
     private AddressDtoBuilder billingAddress;
 }
