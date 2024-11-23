@@ -174,7 +174,9 @@ export default function Brands(): React.JSX.Element {
                 </TableCell>
               </TableRow>
             )}
-            {brands.map((brand) => (
+            {
+              brands &&
+              brands.map((brand) => (
               <TableRow key={brand.id}>
                 <TableCell>{brand.id}</TableCell>
                 <TableCell onDoubleClick={() => startEditing(brand.id, brand.name)}>
