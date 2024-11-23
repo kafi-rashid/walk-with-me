@@ -13,7 +13,7 @@ const useAxios = () => {
   axiosInstance.interceptors.request.use(
     (config) => {
       if (user) {
-        // config.headers.Authorization = `Bearer ${ user.refreshToken }`;
+        config.headers.Authorization = `Bearer ${ user.refreshToken }`;
       }
       return config;
     },
