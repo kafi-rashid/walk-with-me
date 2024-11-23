@@ -33,9 +33,14 @@ public class OrderController {
         List<OrderDTO> orders = orderService.getAllOrders();
         return ResponseEntity.ok(orders);
     }
+//    @GetMapping("/by-user")
+//    public ResponseEntity<List<OrderDTO>> getAllOrdersByUser(@RequestParam Long userId) {
+//        List<OrderDTO> orders = orderService.getAllOrdersByUser(userId);
+//        return ResponseEntity.ok(orders);
+//    }
     @GetMapping("/by-user")
-    public ResponseEntity<List<OrderDTO>> getAllOrdersByUser(@RequestParam Long userId) {
-        List<OrderDTO> orders = orderService.getAllOrdersByUser(userId);
+    public ResponseEntity<List<OrderDTO>> getAllOrdersByUser(@RequestParam(required = false) Long userId, @RequestParam(required = false) Long sellerId) {
+        List<OrderDTO> orders = orderService.getAllOrdersByUser(userId, sellerId);
         return ResponseEntity.ok(orders);
     }
 
