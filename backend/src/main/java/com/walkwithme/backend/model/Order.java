@@ -29,8 +29,10 @@ public class Order {
 
     @Column(nullable = false)
     private Double totalAmount;
-    @OneToOne
+    @ManyToOne
+    @JoinColumn(name = "seller_id", nullable = true)
     private UserEntity seller;
+
     @ManyToOne
     @JoinColumn(name = "shipping_address_id", nullable = true)
     private Address shippingAddress;

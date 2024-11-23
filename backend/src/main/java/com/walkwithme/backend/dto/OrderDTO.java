@@ -15,6 +15,6 @@ public class OrderDTO {
     private OrderStatus status;
     private Double totalAmount;
     private Long shippingAddressId;
-    private long billingAddressId;
+    private Long billingAddressId;
 }
 
